@@ -1,0 +1,158 @@
+<!--
+LiteChat 0.0.1 
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LiteChat Registration</title>
+    <link rel="icon" href="../data/icon.png" type="image/png">
+    <style>
+        .non-selectable {
+            user-select: none;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 18px 16px 7px 16px;
+            background-color: #fff;
+            border-radius: 14px;
+        }
+        .valid_container {
+            border: 2px solid #56ff30;
+            transition: border-color 0.5s ease;
+            box-shadow: 0 0 45px rgba(4, 232, 72, 0.6);
+            transition: box-shadow 0.8s ease;
+        }
+        .invalid_container {
+            border: 2px solid #ff9e30;
+            transition: border-color 0.5s ease;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.32);
+            transition: box-shadow 0.5s ease;
+        }
+        .conteiner_inputs {
+            font-size: 16px;
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            outline: 0px solid #ffffff;
+        }
+        .valid_border {
+            border: 1px solid rgb(40, 255, 44);
+            transition: border-color 0.3s ease;
+        }
+        .invalid_border {
+            border: 1px solid rgb(255, 128, 40);
+            transition: border-color 0.3s ease;
+        }
+        .valid_button {
+            background-color: rgb(101, 219, 136);
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+        .invalid_button {
+            background-color: rgb(255, 72, 62);
+            transition: background-color 0.3s ease;
+            cursor: default;
+        }
+    </style>
+</head>
+    <body style="background-color: rgb(255, 180, 130); font-family: Arial;">
+        <div id="container" class="container" style="position: relative; text-align: center; top: 70px;">
+            <form>
+                <img src="../data/icon_small.png" class="non-selectable">
+                <!--<div class="non-selectable"><h1>Registration</h1></div>-->
+                <input type="email" id="email_input" placeholder="email" class="conteiner_inputs">
+                <input type="text" id="username_input" placeholder="username" class="conteiner_inputs">
+                <input type="text" id="name_input" placeholder="name" class="conteiner_inputs">
+                <input type="password" id="password_input" placeholder="password" class="conteiner_inputs">
+                <div style="font-size: 12px; height: 26px;" class="non-selectable">By creating an account, you agree to our <a style="color: rgb(0, 109, 182);" href="../data/terms_of_use.html" target="_blank">terms of use</a> and <a style="color: rgb(0, 109, 182);" href="../data/privacy_policy.html" target="_blank">privacy policy</a>.</div>
+                <input value="Send" id="send_button" type="button" class="conteiner_inputs" style="width: 18%; border-radius: 10px; font-size: 19px;"  onclick="send()">
+            </form>
+        </div>
+    </body>
+</html>
+<script>
+
+console.log("start")
+const ok_color = [15, 210, 70]
+const no_color = [255, 128, 40]
+const allElemsNames = ["email_input", "username_input", "name_input", "password_input"]
+const allElems = new Array
+for (let elem of allElemsNames) {
+    allElems.push(document.getElementById(elem))
+}
+let valides = new Array
+let currentColor = [no_color, no_color]
+
+function changeColor() {
+    valides = new Array
+    for (let elem_name of allElemsNames){
+        let valid = false
+        let elem = document.getElementById(elem_name)
+        if (elem_name == "email_input") {
+            valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(elem.value)
+        } if (elem_name == "username_input") {
+            valid = elem.value.length > 0
+        } if (elem_name == "name_input") {
+            valid = elem.value.length > 0
+        } if (elem_name == "password_input") {
+            valid = elem.value.length > 0
+        }
+        valides.push(valid)
+    }
+    for (let n = 0; n < valides.length; n++) {
+        let elem = allElems[n]
+        if (valides[n]) {
+            elem.classList.remove("invalid_border")
+            elem.classList.add("valid_border")
+        } else {
+            elem.classList.remove("valid_border")
+            elem.classList.add("invalid_border")
+        }
+    }
+    let av = true
+    for (let x of valides) {
+        if (!x) {av = false}
+    }
+    let button = document.getElementById("send_button")
+    let container = document.getElementById("container")
+    if (av) {
+        container.classList.remove("invalid_container")
+        container.classList.add("valid_container")
+        button.classList.remove("invalid_button")
+        button.classList.add("valid_button")
+    } else {
+        container.classList.remove("valid_container")
+        container.classList.add("invalid_container")
+        button.classList.remove("valid_button")
+        button.classList.add("invalid_button")
+    }
+}
+
+setInterval(changeColor, 16)
+
+function request(adr, func) {
+    let xhr = new XMLHttpRequest()
+    xhr.open("GET", adr, true)
+    xhr.onload = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            func(xhr.responseText)
+        } else {
+            console.error("request error: adr - " + adr + ", status - " + xhr.status + ", readyState - " + xhr.readyState)
+            console.error(xhr)
+        }
+    }
+    xhr.send()
+}
+
+function send() {
+    let email = document.getElementById("email_input").value
+    let username = document.getElementById("username_input").value
+    let name = document.getElementById("name_input").value
+    let password = document.getElementById("password_input").value
+    request(`http://127.0.0.1:8080/registration/check_all?email=${email}&username=${username}&name=${name}&password=${password}`)
+}
+
+</script>

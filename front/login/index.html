@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>LiteChat Registration</title>
+        <link rel="stylesheet" href=../front/login/index.css>
+        <link rel="icon" href=../front/data/icon.png type="image/png">
+    </head>
+
+    <body style="background-color: rgb(255, 180, 130); font-family: Arial;">
+
+        <div id="container" class="container" style="position: relative; text-align: center; top: 70px;">
+            <form>
+                <img src=../front/data/icon_login.png class="non-selectable">
+                <!--<div class="non-selectable"><h1>Registration</h1></div>-->
+                <input type="email" id="email-username_input" placeholder="email or username" class="conteiner_inputs">
+                <input type="password" id="password_input" placeholder="password" class="conteiner_inputs">
+                <div style="font-size: 14px; height: 26px;" class="non-selectable">Don't you have an account? <a style="color: rgb(0, 109, 182);" href="../registration">Register</a>.</div>
+                <input value="Send" id="send_button" type="button" class="conteiner_inputs, button_send"  onclick="send()">
+            </form>
+        </div>
+        
+    </body>
+</html> 
+
+<script src=../front/request_func.js></script>
+<script src=../front/login/index.js></script>

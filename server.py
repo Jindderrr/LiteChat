@@ -10,6 +10,7 @@ app = Flask(__name__)
 
 USERS_REGISTERING_NOW = {}
 
+
 @app.route('/login')
 def login_page():
     with open("front/login/index.html") as f:
@@ -20,6 +21,7 @@ def login_page():
 def registration_page():
     with open("front/registration/index.html") as f:
         return f.read()
+
 
 @app.route('/')
 def main_page():
@@ -41,7 +43,7 @@ def check_registration(path):  # эта функция для обработки
     if path == "registration/check_username":  # ->->->
         a_username = request.args.get("username")
         db_sess = db_session.create_session()
-        username_is_free = not db_sess.query(User).filter(User.email == a_username).first() # username свободен?
+        username_is_free = not db_sess.query(User).filter(User.username == a_username).first()  # username свободен?
         print("username is free: " + username_is_free)
         return jsonify(username_is_free)  # <-<-<-
 
@@ -50,7 +52,8 @@ def check_registration(path):  # эта функция для обработки
         a_username = request.args.get("username")
         # тут надо ещё раз проверить, что всё ок (нет пользователей с такой почтой и username),
         db_sess = db_session.create_session()
-        is_ok = not db_sess.query(User).filter(User.username == a_username).first() and not db_sess.query(User).filter(User.email == a_email).first() and "@" not in a_username  # всё ок?
+        is_ok = not db_sess.query(User).filter(User.username == a_username).first() and not db_sess.query(User).filter(
+            User.email == a_email).first() and "@" not in a_username  # всё ок?
         print(is_ok)
         if is_ok:
             code = random.randint(100000, 999999)  # код подтверждения
@@ -76,12 +79,11 @@ def check_registration(path):  # эта функция для обработки
                 a_password = request.args.get("password")
                 # если код верный, то внести пользовотеля в БД
                 db_sess = db_session.create_session()
-                db_sess.add(User(
-                    name=a_name,
-                    username=a_username,
-                    email=a_email,
-                    hashed_password=generate_password_hash(a_password)
-                ))
+                user = User(name=a_name,
+                            username=a_username,
+                            email=a_email)
+                user.set_password(a_password)
+                db_sess.add(user)
                 db_sess.commit()
                 print('user register')
         return {"response": is_success}
@@ -91,9 +93,10 @@ def check_registration(path):  # эта функция для обработки
         a_password = request.args.get("password")
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(a_email_username == User.email).first()
-        if user == None: user = db_sess.query(User).filter(a_email_username == User.username).first()
-        is_ok = user and user.check_password(a_password)  # проверка, существует ли пользователь с такой почтой и паролем
-        if is_ok == None: is_ok = False
+        if user is None: user = db_sess.query(User).filter(a_email_username == User.username).first()
+        is_ok = user and user.check_password(
+            a_password)  # проверка, существует ли пользователь с такой почтой и паролем
+        if is_ok is None: is_ok = False
         print(is_ok)
         return {"response": is_ok}
     return {"response": False}
@@ -106,6 +109,7 @@ def get_file_in_front(filename):
         return send_from_directory('front', filename)
     else:
         print(request.remote_addr + " запросил " + filename + " - ОТКАЗАНО!")
+
 
 if __name__ == '__main__':
     db_session.global_init('db/chat.db')

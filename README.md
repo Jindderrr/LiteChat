@@ -1,3 +1,3 @@
-# LiteChat 0.0.0
+# LiteChat 0.0.1
 
 LiteChat - простой чат

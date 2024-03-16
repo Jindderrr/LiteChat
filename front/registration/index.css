@@ -1,0 +1,50 @@
+.non-selectable {
+    user-select: none;
+}
+.container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 18px 16px 7px 16px;
+    background-color: #fff;
+    border-radius: 14px;
+}
+.valid_container {
+    border: 2px solid #56ff30;
+    transition: border-color 0.5s ease;
+    box-shadow: 0 0 45px rgba(4, 232, 72, 0.6);
+    transition: box-shadow 0.8s ease;
+}
+.invalid_container {
+    border: 2px solid #ff9e30;
+    transition: border-color 0.5s ease;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.32);
+    transition: box-shadow 0.5s ease;
+}
+.conteiner_inputs {
+    font-size: 16px;
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    outline: 0px solid rgb(255, 128, 40);
+}
+.valid_input {
+    border: 1px solid rgb(40, 255, 44);
+    transition: border-color 0.3s ease;
+    accent-color: rgb(40, 255, 44);
+}
+.invalid_input {
+    border: 1px solid rgb(255, 128, 40);
+    transition: border-color 0.3s ease;
+    accent-color: rgb(40, 255, 44);
+}
+.valid_button {
+    background-color: rgb(101, 219, 136);
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+.invalid_button {
+    background-color: rgb(255, 72, 62);
+    transition: background-color 0.3s ease;
+    cursor: default;
+}

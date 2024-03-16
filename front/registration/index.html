@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>LiteChat Registration</title>
+        <link rel="stylesheet" href=../front/registration/index.css>
+        <link rel="icon" href=../front/data/icon.png type="image/png">
+    </head>
+
+    <body style="background-color: rgb(255, 180, 130); font-family: Arial;">
+
+        <div id="container" class="container" style="position: relative; text-align: center; top: 70px;">
+            <form>
+                <img src=../front/data/icon_reg.png class="non-selectable">
+                <!--<div class="non-selectable"><h1>Registration</h1></div>-->
+                <input type="email" id="email_input" placeholder="email" class="conteiner_inputs">
+                <input type="text" id="username_input" placeholder="username" class="conteiner_inputs">
+                <input type="text" id="name_input" placeholder="name" class="conteiner_inputs">
+                <input type="password" id="password_input" placeholder="password" class="conteiner_inputs">
+                <div style="font-size: 11px; height: 28px;" class="non-selectable">
+                <input id="agree_input" type="checkbox"> By creating an account, you agree to our <a style="color: rgb(0, 109, 182);" href="../front/data/terms_of_use.html" target="_blank">terms of use</a> and <a style="color: rgb(0, 109, 182);" href="../front/data/privacy_policy.html" target="_blank">privacy policy</a>.
+                </div>
+                <div style="font-size: 12px; height: 24px;" class="non-selectable">Already have an account? <a style="color: rgb(0, 109, 182);" href="../login">Login</a>.</div>
+                <input value="Send" id="send_button" type="button" class="conteiner_inputs" style="width: 18%; border-radius: 10px; font-size: 19px;"  onclick="send()">
+            </form>
+        </div>
+        
+    </body>
+</html> 
+<script src=../front/request_func.js></script>
+<script src=../front/registration/index.js></script>

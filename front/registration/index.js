@@ -17,7 +17,7 @@ function changeColor() {
         if (elem_name == "email_input") {
             valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(elem.value)
         } if (elem_name == "username_input") {
-            valid = elem.value.length > 0
+            valid = elem.value.length > 0 && !elem.value.includes("@")
         } if (elem_name == "name_input") {
             valid = elem.value.length > 0
         } if (elem_name == "password_input") {
@@ -65,6 +65,15 @@ function send() {
         let username = document.getElementById("username_input").value
         let name = document.getElementById("name_input").value
         let password = document.getElementById("password_input").value
-        request(`http://127.0.0.1:8080/request/registration/send_email?email=${email}&username=${username}`)
+        request(`/request/registration/send_email?email=${email}&username=${username}`, function(response) {
+            console.log(response)
+            if (response["response"] == true) {
+                code = prompt("code?")
+                request(`/request/registration/check_code?email=${email}&name=${name}&password=${password}&code=${code}`, function(response2) {
+                    console.log(response2["response"])
+                    if (response2["response"]) {window.location.assign("./")}
+                })
+            }
+        })
     }
 }

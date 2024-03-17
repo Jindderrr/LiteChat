@@ -58,6 +58,9 @@ function send() {
     if (av) {
         let email = document.getElementById("email-username_input").value
         let password = document.getElementById("password_input").value
-        request(`http://127.0.0.1:8080/request/login?email-username=${email}&password=${password}`)
+        request(`/request/login?email-username=${email}&password=${password}`, function(response) {
+            console.log(response)
+            if (response["response"]) {window.location.assign("./")}
+        })
     }
 }

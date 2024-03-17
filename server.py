@@ -103,7 +103,7 @@ def check_registration(path):  # эта функция для обработки
         if user is None: user = db_sess.query(User).filter(
             a_email_username == User.username).first()
         is_ok = user and user.check_password(
-            a_password)  # проверка, существует ли пользователь с такой почтой и паролем
+            a_password)
         if is_ok is None: is_ok = False
         print(is_ok)
         return {"response": is_ok}
@@ -136,11 +136,12 @@ def check_registration(path):  # эта функция для обработки
         answer = []
         for chat_id in user_chats_id:
             chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
+            last_mess = chat.messages.query(
+                               Message).filter(Message.id).first()
             answer.append({"chat_name": chat.name,
                            "chat_type": chat.type,
-                           "chat_last_message": max(chat.messages.query(
-                               Message).filter(Message.id).all()),
-                           "number_of_unread_messages": chat.unread_messages})
+                           "number_of_unread_messages": chat.unread_messages,
+                           "chat_last_message": {"message_text":last_mess.text, "message_sender":last_mess.sender, "message_date":last_mess.date}})
         return answer
     return {"response": False}
 

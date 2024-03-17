@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7729deaf-55e9-4b8c-a53c-f5b05e029927" name="Changes" comment="added chats and messages db">
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/LiteChat.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/LiteChat.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_py/chats.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_py/chats.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_py/db_session.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_py/db_session.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_py/messages.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_py/messages.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_py/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_py/users.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
-    </list>
+    <list default="true" id="7729deaf-55e9-4b8c-a53c-f5b05e029927" name="Changes" comment="some work" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -181,7 +171,15 @@
       <option name="project" value="LOCAL" />
       <updated>1710664069743</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="some work">
+      <option name="closed" value="true" />
+      <created>1710684348609</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1710684348609</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -197,6 +195,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added chats and messages db" />
-    <option name="LAST_COMMIT_MESSAGE" value="added chats and messages db" />
+    <MESSAGE value="some work" />
+    <option name="LAST_COMMIT_MESSAGE" value="some work" />
   </component>
 </project>

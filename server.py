@@ -75,6 +75,7 @@ def check_registration(path):  # эта функция для обработки
 
         # тут надо проверить, что код верный,
         is_success = False  # всё ок?
+        hashed_pass = None
         if a_email in USERS_REGISTERING_NOW:
             is_success = int(USERS_REGISTERING_NOW[a_email][0]) == int(a_code)
             print("code is valid - " + str(is_success))
@@ -89,10 +90,11 @@ def check_registration(path):  # эта функция для обработки
                             username=a_username,
                             email=a_email)
                 user.set_password(a_password)
+                hashed_pass = user.hashed_password
                 db_sess.add(user)
                 db_sess.commit()
                 print('user register')
-        return {"response": is_success}
+        return {"response": is_success, 'hash': hashed_pass}
 
     if path == "login":  # от пользователя получены данные для входа
         a_email_username = request.args.get("email-username")
@@ -100,13 +102,19 @@ def check_registration(path):  # эта функция для обработки
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(
             a_email_username == User.email).first()
-        if user is None: user = db_sess.query(User).filter(
-            a_email_username == User.username).first()
-        is_ok = user and user.check_password(
-            a_password)
-        if is_ok is None: is_ok = False
+        if user is None:
+            user = db_sess.query(User).filter(
+                a_email_username == User.username).first()
+        is_ok = user and user.check_password(a_password)
+        if is_ok is None:
+            is_ok = False
+            hashed_pass, username, name, email = None, None, None, None
+        else:
+            hashed_pass = user.hashed_password
+            name, email, username = user.name, user.email, user.username
         print(is_ok)
-        return {"response": is_ok}
+        return {"response": is_ok, 'hash': hashed_pass, 'username': username,
+                'name': name, 'email': email}
     if path == "start_chat":
         db_sess = db_session.create_session()
         fst_user = db_sess.query(User).filter(
@@ -127,6 +135,7 @@ def check_registration(path):  # эта функция для обработки
         scnd_user.chats += f'{scnd_chat.id}' if scnd_user.chats == '' else f' {scnd_chat.id}'
         db_sess.commit()
         print(f'added chats: {fst_chat.id}, {scnd_chat.id}')
+        return
     if path == 'get_my_chats':  # {"chat_name", "chat_type", "chat_last_message", "number_of_unread_messages"}
         db_sess = db_session.create_session()
 
@@ -137,11 +146,14 @@ def check_registration(path):  # эта функция для обработки
         for chat_id in user_chats_id:
             chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
             last_mess = chat.messages.query(
-                               Message).filter(Message.id).first()
+                Message).filter(Message.id).first()
             answer.append({"chat_name": chat.name,
                            "chat_type": chat.type,
                            "number_of_unread_messages": chat.unread_messages,
-                           "chat_last_message": {"message_text":last_mess.text, "message_sender":last_mess.sender, "message_date":last_mess.date}})
+                           "chat_last_message": {
+                               "message_text": last_mess.text,
+                               "message_sender": last_mess.sender,
+                               "message_date": last_mess.date}})
         return answer
     return {"response": False}
 

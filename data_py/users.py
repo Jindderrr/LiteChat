@@ -23,3 +23,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+
+    def add_chat(self, chat_id):
+        self.chats += chat_id if self.chats == '' else f';{chat_id}'

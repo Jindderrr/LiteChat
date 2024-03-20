@@ -122,32 +122,26 @@ def check_registration(path):  # эта функция для обработки
         scnd_user = db_sess.query(User).filter(
             User.username == request.args.get("another_username")).first()
 
-        fst_chat = Chat(name=scnd_user.username,
-                        type='single'
-                        )
-        db_sess.add(fst_chat)
-        fst_user.chats += f'{fst_chat.id}' if fst_user.chats == '' else f' {fst_chat.id}'
-
-        scnd_chat = Chat(name=fst_user.username,
-                         type='single'
-                         )
-        db_sess.add(scnd_chat)
-        scnd_user.chats += f'{scnd_chat.id}' if scnd_user.chats == '' else f' {scnd_chat.id}'
+        chat = Chat(users=f'{fst_user.id};{scnd_user.id}',
+                    type='single')
+        db_sess.add(chat)
         db_sess.commit()
-        print(f'added chats: {fst_chat.id}, {scnd_chat.id}')
+        fst_user.add_chat(chat.id)
+        scnd_user.add_chat(chat.id)
+        print(f'added chat: {chat.id}')
         return
     if path == 'get_my_chats':  # {"chat_name", "chat_type", "chat_last_message", "number_of_unread_messages"}
         db_sess = db_session.create_session()
 
         user = db_sess.query(User).filter(
             User.username == request.args.get('username')).first()
-        user_chats_id = user.chats.split()
+        user_chats_id = user.chats.split(';')
         answer = []
         for chat_id in user_chats_id:
             chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
-            last_mess = chat.messages.query(
-                Message).filter(Message.id).first()
-            answer.append({"chat_name": chat.name,
+            last_mess = \
+            sorted(chat.messages, key=lambda x: x.id, reverse=True)[0]
+            answer.append({"chat_name": chat.users,
                            "chat_type": chat.type,
                            "number_of_unread_messages": chat.unread_messages,
                            "chat_last_message": {

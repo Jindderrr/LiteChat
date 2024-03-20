@@ -10,7 +10,7 @@ class Chat(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True,
                            autoincrement=True)
-    name = sqlalchemy.Column(sqlalchemy.String)
+    users = sqlalchemy.Column(sqlalchemy.String)
     type = sqlalchemy.Column(sqlalchemy.String)
     unread_messages = sqlalchemy.Column(sqlalchemy.Integer,
                                         default=0)

@@ -60,7 +60,13 @@ function send() {
         let password = document.getElementById("password_input").value
         request(`/request/login?email-username=${email}&password=${password}`, function(response) {
             console.log(response)
-            if (response["response"]) {window.location.assign("./")}
+            if (response["response"]) {
+                setCookie("email", response["email"], 30)
+                setCookie("username", response["username"], 30)
+                setCookie("name", response["name"], 30)
+                setCookie("password_hash", response["hash"], 30)
+                window.location.assign("./")
+            }
         })
     }
 }

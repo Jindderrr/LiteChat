@@ -1,3 +1,40 @@
+.left_panel_container{
+    position: absolute;
+    left: 5px;
+    width: 40px;
+    top: 5px;
+    height: 45px;
+}
+.left_panel_buttons{
+    position: absolute;
+    border-radius: 36%;
+    aspect-ratio: 1;
+    left: 0px;
+    background-color: rgb(98, 203, 0);
+    border: 2px outset white;
+    cursor: pointer;
+}
+button:active {
+    border-style: inset;
+}
+.add_chat_button {
+    display: inline-block;
+    top: 0%;
+    width: 100%;
+    color: #fff;
+    font-size: 30px;
+    text-align: center;
+    line-height: 10px;
+}
+.settings_button {
+    display: inline-block;
+    top: 100%;
+    width: 100%;
+    color: #fff;
+    font-size: 30px;
+    text-align: center;
+    line-height: 10px;
+}
 .chats_container {
     overflow-y: auto;
     overflow-x: hidden;
@@ -8,13 +45,11 @@
     top: 0px;
     left: 50px;
     background-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.3);
 }
 .chat_button {
     height: 11.111%;
     min-height: 50px;
-    /*
-    background-color: aqua;
-    */
 }
 .onmouse_div { 
     position: relative;
@@ -53,12 +88,22 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.chat_button_time_box {
+    position: absolute;
+    top: 20%;
+    height: 60%;
+    right: 14px;
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .chat_container {
     position: absolute;
     top: 0px;
     height: calc(100% - 50px);
-    left: calc(35% + 50px);
-    width: calc(100% - 35% - 50px);
+    right: 0px;
+    /*left: calc(35% + 50px);*/
     background-color: rgba(41, 181, 16, 0.5);
 }
 .chat_text_input_container {
@@ -67,8 +112,9 @@
     bottom: 0px;
     height: 50px;
     max-height: calc(210px + 30px);
-    width: calc(100% - 35% - 50px);
     background-color: white;
+    box-shadow: 0 0 50px rgb(255, 150, 0);
+    border-top: 2px solid rgba(255, 130, 0, 0.25);
 }
 .input_box {
     position: absolute;
@@ -85,4 +131,15 @@
     outline: hidden;
     border-width: 0px;
     background-color: rgb(255, 255, 255);
+}
+.send_message_button {
+    position: absolute;
+    right: 10px;
+    height: 48px;
+    aspect-ratio: 2;
+    border: 2px outset white;
+    background-color: aqua;
+    bottom: 2px;
+    border-radius: 5px;
+    max-width: 10%;
 }

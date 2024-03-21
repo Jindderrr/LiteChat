@@ -8,15 +8,19 @@
     
 </head>
     <body style="background-color: rgb(255, 180, 130); font-family: Arial; overflow: hidden;">
-        <div id="chats_container" class="chats_container">
-
-        </div>
         <div id="chat_container" class="chat_container"> </div>
         <div id="chat_text_input_container" class="chat_text_input_container"> 
             <textarea id="message_textarea" class="input_box" oninput="autoResize()" rows="1" placeholder=""></textarea>
-            <input type="button" value="send" style="position: absolute; right: 10px; height: 48px; aspect-ratio: 2; bottom: 2px; border-radius: 5px; max-width: 10%;">
+            <input type="button" class="send_message_button" value="send">
+        </div>
+        <div id="chats_container" class="chats_container">
+            
+        </div>
+        <div id="left_panel_container" class="left_panel_container">
+            <button class="left_panel_buttons add_chat_button" onclick="newChat()">+</button>
+            <button class="left_panel_buttons settings_button">i</button>
         </div>
     </body>
 </html>
-<script src=../front/request_func.js></script>
+<script src=../front/base.js></script>
 <script src=../front/main/index.js></script>

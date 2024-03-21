@@ -1,3 +1,14 @@
+// chats_menu
+let MY_USERNAME = getCookie("username")
+let chats = []
+request(`/request/get_my_chats?username=${MY_USERNAME}`, function(response) {
+    chats = response
+    UpdateChats()
+})
+
+
+//message placeholder
+
 const place_holder_text = "message.."
 function autoResize() {
     const textarea = document.getElementById('message_textarea')
@@ -21,6 +32,7 @@ function printPlaceholder() {
 setTimeout(printPlaceholder, 300)
 
 //------------------------------------------------------------------------------------------------------------------------------------------------
+//chats
 
 const NO_SELECTED_CHAT_COLOR = 'rgb(0, 0, 0, 0.03)'
 const MOUSEOVER_CHAT_COLOR = 'rgb(0, 0, 0, 0.15)'
@@ -38,22 +50,26 @@ function mouse_out(id) {
     }
 }
 
-let num_chats = 50
-for (let i = 0; i < num_chats; i++) {
-    last_message = "Lol kek cheburek kek lol Ya crytoy nevyrayatno crytoy, Yefr erfers, Ya super cryt"
-    let html = `
-        <div class="chat_button"> 
-            <div id="onmouse_div_${i}" class="onmouse_div" onmouseover="mouse_over(${i})" onmouseout="mouse_out(${i})" onclick="select_chat(${i})"> 
-                <div class="ico_container"> 
-                    <img src=/front/main/ico_${Math.floor(Math.random() * 2)}.png class="chat_ico"> 
-                    <div id="chat_text_box_${i}" class="chat_button_text_box"> <nobr><b>Name</b> <br>${last_message}</nobr></div>
+function UpdateChats() {
+    for (let i = 0; i < chats.length; i++) {
+        let html = `
+            <div class="chat_button"> 
+                <div id="onmouse_div_${i}" class="onmouse_div" onmouseover="mouse_over(${i})" onmouseout="mouse_out(${i})" onclick="select_chat(${i})"> 
+                <div id="chat_text_box__${i}" class="chat_button_time_box"> <i> ${chats[i]["chat_last_message"]["message_date"]} </i> </div>
+                    <div class="ico_container"> 
+                        <img src=/front/main/ico_${Math.floor(Math.random() * 2)}.png class="chat_ico"> 
+                        
+                        <div id="chat_name_text_box_${i}" class="chat_button_text_box"> <nobr><b>${chats[i]["chat_name"]}</b></nobr></div>
+                        <div id="chat_message_text_box_${i}" class="chat_button_text_box" style="font-size:14px"> <nobr><br>${chats[i]["chat_last_message"]["message_text"]}</nobr></div>
+                        
+                    </div>
+                    
                 </div>
-                
+                <div class="chat_button"">
             </div>
-            <div class="chat_button"">
-        </div>
-    `
-    document.getElementById("chats_container").innerHTML += html
+        `
+        document.getElementById("chats_container").innerHTML += html
+    }
 }
 
 function resize_chat_text_box() {
@@ -72,4 +88,33 @@ function select_chat(i) {
     elem = document.getElementById("onmouse_div_" + i)
     elem.style.backgroundColor = SELECTED_CHAT_COLOR
     elem.style.borderRadius = "12px 0px 0px 12px"
+}
+
+//
+function to_vertical_mode() {
+    document.getElementById("left_panel_container").style.visibility = "hidden"
+    document.getElementById("chats_container").style.visibility = "hidden"
+    document.getElementById("chat_container").style.width = "100%"
+    document.getElementById("chat_text_input_container").style.width = "100%"
+}
+
+function to_horizontal_mode() {
+    document.getElementById("left_panel_container").style.visibility = "visible"
+    document.getElementById("chats_container").style.visibility = "visible"
+    document.getElementById("chat_container").style.width = "calc(100% - 35% - 50px)"
+    document.getElementById("chat_text_input_container").style.width = "calc(100% - 35% - 50px)"
+}
+
+window.addEventListener('resize', function() {
+    if (window.innerHeight / window.innerWidth > 1) { to_vertical_mode() }
+    else {to_horizontal_mode()}
+})
+if (window.innerHeight / window.innerWidth > 1) { to_vertical_mode() }
+else {to_horizontal_mode()}
+
+// кнопки левой панели
+
+function newChat() {
+    another_username = prompt("username?")
+    request(`/request/start_chat?my_username=${MY_USERNAME}&another_username=${another_username}`)
 }

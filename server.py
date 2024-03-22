@@ -116,14 +116,16 @@ def check_registration(path):  # эта функция для обработки
         return {"response": is_ok, 'hash': hashed_pass, 'username': username,
                 'name': name, 'email': email}
     if path == "start_chat":
+        pass_hash = request.args.get("password_hash")
         db_sess = db_session.create_session()
         fst_user = db_sess.query(User).filter(
             User.username == request.args.get("my_username")).first()
         scnd_user = db_sess.query(User).filter(
             User.username == request.args.get("another_username")).first()
-
-        chat = Chat(users=f'{fst_user.id};{scnd_user.id}',
-                    type='single')
+        if not fst_user.check_password(pass_hash):
+            return {"response": False, 'error': 'Hash does not match'}
+            chat = Chat(users=f'{fst_user.id};{scnd_user.id}',
+                        type='single')
         db_sess.add(chat)
         db_sess.commit()
         fst_user.add_chat(chat.id)
@@ -131,17 +133,21 @@ def check_registration(path):  # эта функция для обработки
         print(f'added chat: {chat.id}')
         return
     if path == 'get_my_chats':  # {"chat_name", "chat_type", "chat_last_message", "number_of_unread_messages"}
+        pass_hash = request.args.get("password_hash")
         db_sess = db_session.create_session()
 
         user = db_sess.query(User).filter(
             User.username == request.args.get('username')).first()
+        if not user.check_password(pass_hash):
+            return {"response": False, 'error': 'Hash does not match'}
         user_chats_id = user.chats.split(';')
         answer = []
         for chat_id in user_chats_id:
             chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
             last_mess = \
-            sorted(chat.messages, key=lambda x: x.id, reverse=True)[0]
-            answer.append({"chat_name": chat.users,
+                sorted(chat.messages, key=lambda x: x.id, reverse=True)[0]
+            answer.append({'chat_id': chat.id,
+                           "chat_name": chat.users,
                            "chat_type": chat.type,
                            "number_of_unread_messages": chat.unread_messages,
                            "chat_last_message": {

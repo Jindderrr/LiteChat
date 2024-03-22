@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7729deaf-55e9-4b8c-a53c-f5b05e029927" name="Changes" comment="some work">
+    <list default="true" id="7729deaf-55e9-4b8c-a53c-f5b05e029927" name="Changes" comment="ignore idea">
+      <change beforePath="$PROJECT_DIR$/.idea/LiteChat.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/LiteChat.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
     </list>
@@ -199,6 +200,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added chats and messages db" />
     <MESSAGE value="some work" />
-    <option name="LAST_COMMIT_MESSAGE" value="some work" />
+    <MESSAGE value="ignore idea" />
+    <option name="LAST_COMMIT_MESSAGE" value="ignore idea" />
   </component>
 </project>

@@ -1,4 +1,4 @@
-function request(adr, func) {
+function request(adr, func=function(response){console.log(response)}) {
     let xhr = new XMLHttpRequest()
     xhr.open("GET", adr, true)
     xhr.onload = function() {
@@ -20,6 +20,7 @@ function setCookie(name, value, days) {
         expires = "; expires=" + date.toUTCString()
     }
     document.cookie = name + "=" + value + expires + "; path=/"
+    updateCookieVar()
 }
 
 function getCookie(name) {
@@ -28,9 +29,20 @@ function getCookie(name) {
     for (let i = 0; i < cookies.length; i++) {
         let cookie = cookies[i]
         while (cookie.charAt(0) === ' ') {
-            cookie = cookie.substring(1, cookie.length);
+            cookie = cookie.substring(1, cookie.length)
         } if (cookie.indexOf(nameEQ) === 0) {
-            return cookie.substring(nameEQ.length, cookie.length);
+            return cookie.substring(nameEQ.length, cookie.length)
         }
     }
+    updateCookieVar()
 }
+
+var cookies
+function updateCookieVar() {
+    cookies = {}
+    document.cookie.split(';').forEach(cookie => {
+        let [name, value] = cookie.trim().split('=')
+        cookies[name] = decodeURIComponent(value)
+    })
+}
+updateCookieVar()

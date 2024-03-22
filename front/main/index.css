@@ -44,8 +44,16 @@ button:active {
     height: 100%;
     top: 0px;
     left: 50px;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(41, 181, 16, 0.342);
     box-shadow: 0 0 18px rgba(0, 0, 0, 0.3);
+}
+.chat_fon_img {
+    position: fixed;
+    z-index: -1;
+    width: 100%;
+    min-height: 100%;
+    opacity: 10%;
+    bottom: 0px;
 }
 .chat_button {
     height: 11.111%;
@@ -103,8 +111,45 @@ button:active {
     top: 0px;
     height: calc(100% - 50px);
     right: 0px;
-    /*left: calc(35% + 50px);*/
-    background-color: rgba(41, 181, 16, 0.5);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.messages_container {
+    display: flex;
+    flex-direction: column;
+}
+.message_box {
+    margin: 4px;
+    width: 100%;
+    display: flex;
+}
+.my_message, .no_my_message, .notification_message {
+    position: relative;
+    width: max-content;
+    word-break: break-all;
+}
+.my_message, .no_my_message{
+    max-width: 40%;
+    padding: 10px;
+    font-size: 18px;
+}
+.my_message {
+    right: 2%;
+    border-radius: 19px 19px 2px 19px;
+    background-color: rgb(255, 255, 255);
+}
+.no_my_message {
+    left: 2%;
+    border-radius: 19px 19px 19px 2px;
+    background-color: rgb(171, 171, 171);
+}.notification_message {
+    max-width: 70%;
+    padding: 8px;
+    margin-top: 12px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.2);
 }
 .chat_text_input_container {
     position: absolute;

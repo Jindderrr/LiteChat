@@ -1,7 +1,6 @@
 // chats_menu
-let MY_USERNAME = getCookie("username")
 let chats = []
-request(`/request/get_my_chats?username=${MY_USERNAME}`, function(response) {
+request(`/request/get_my_chats?username=${cookies["username"]}`, function(response) {
     chats = response
     UpdateChats()
 })
@@ -88,9 +87,12 @@ function select_chat(i) {
     elem = document.getElementById("onmouse_div_" + i)
     elem.style.backgroundColor = SELECTED_CHAT_COLOR
     elem.style.borderRadius = "12px 0px 0px 12px"
+
+    request(`/request/send_msg?username=${cookies["username"]}&msg_text=`)
 }
 
 //
+
 function to_vertical_mode() {
     document.getElementById("left_panel_container").style.visibility = "hidden"
     document.getElementById("chats_container").style.visibility = "hidden"
@@ -116,5 +118,31 @@ else {to_horizontal_mode()}
 
 function newChat() {
     another_username = prompt("username?")
-    request(`/request/start_chat?my_username=${MY_USERNAME}&another_username=${another_username}`)
+    request(`/request/start_chat?my_username=${cookies["username"]}&another_username=${another_username}`)
+}
+
+
+// отправка сообщения
+function send_msg() {
+    let msgText = document.getElementById("message_textarea").value
+    document.getElementById("message_textarea").value = ""
+    request(`/request/send_msg?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&msg_text=${msgText}&chat_id=${chats[SelectedChat]["chat_id"]}`)
+    autoResize()
+    autoScroll()
+}
+
+function autoScroll() {
+    let scrollingDiv = document.getElementById('chat_container');
+    scrollingDiv.scrollTop = scrollingDiv.scrollHeight
+}
+
+function add_msg(msgText, whose_msg) {
+    let html = `
+        <div class="message_box" style="justify-content: ${["end", "start", "center"][whose_msg]};">
+            <div class="${["my_message", "no_my_message", "notification_message"][whose_msg]}">
+                ${msgText}
+            </div>
+        </div>
+    `
+    document.getElementById("message_container").innerHTML += html
 }

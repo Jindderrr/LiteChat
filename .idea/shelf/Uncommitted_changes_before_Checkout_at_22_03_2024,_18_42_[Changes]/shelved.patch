@@ -1,0 +1,32 @@
+Index: server.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import random\r\n\r\nfrom flask import Flask, request, send_from_directory, jsonify\r\n\r\napp = Flask(__name__)\r\n\r\nUSERS_REGISTERING_NOW = {}\r\n\r\n@app.route('/')\r\n@app.route('/login')\r\ndef main_page():\r\n    with open(\"front/login/index.html\") as f:\r\n        return f.read()\r\n\r\n@app.route('/registration')\r\ndef login_page():\r\n    with open(\"front/registration/index.html\") as f:\r\n        return f.read()\r\n\r\n@app.route('/request/<path:path>')\r\ndef check_registration(path): # эта функция для обработки запросов от js'а\r\n    print(path)\r\n    print(request.args)\r\n    if path == \"registration/check_email\":\r\n        a_email = request.args.get(\"email\")\r\n        email_is_free = True # email свободен? !!!\r\n        return jsonify(email_is_free)\r\n\r\n    if path == \"registration/check_username\":\r\n        a_username = request.args.get(\"username\")\r\n        username_is_free = True # username свободен? !!!\r\n        return jsonify(username_is_free)\r\n\r\n    if path == \"registration/send_email\": # пользователь запрашивает код подтверждения\r\n        a_email = request.args.get(\"email\")\r\n        a_username = request.args.get(\"username\")\r\n        # тут надо ещё раз проверить, что всё ок (нет пользователей с такой почтой и username),\r\n        is_ok = True # всё ок? !!!\r\n        if is_ok:\r\n            code = random.randint(100000, 999999) # код подтверждения\r\n            # отправить письмо по почте с кодом подтверждения.\r\n            # пока не отправляем, а просто выводим в консоль\r\n            print(f\"{a_email}: код подтверждения отпрален на почту ({code})\")\r\n            USERS_REGISTERING_NOW[a_email] = (code, a_username)\r\n        return jsonify(is_ok)\r\n\r\n    if path == \"registration/check_code\": # от пользователя получены данные для регистрации\r\n        a_email = request.args.get(\"email\")\r\n        a_code = request.args.get(\"code\")\r\n\r\n        # тут надо проверить, что код верный,\r\n        is_success = False  # всё ок?\r\n        if a_email in USERS_REGISTERING_NOW:\r\n            is_success = USERS_REGISTERING_NOW[a_email][0] == a_code\r\n            if is_success:\r\n                a_username = USERS_REGISTERING_NOW[a_email][1]\r\n                del USERS_REGISTERING_NOW[a_email]\r\n                a_name = request.args.get(\"name\")\r\n                a_password = request.args.get(\"password\")\r\n                # если код верный, то внести пользовотеля в БД !!!\r\n\r\n        return jsonify(is_success)\r\n\r\n    if path == \"login\": # от пользователя получены данные для регистрации\r\n        a_email = request.args.get(\"email\")\r\n        a_password = request.args.get(\"password\")\r\n        is_ok = True # проверка, существует ли пользователь с такой почтой и паролем !!!\r\n        return jsonify(is_ok)\r\n\r\n    return {\"responce\": False}\r\n\r\n@app.route('/front/<path:filename>')\r\ndef get_file_in_front(filename):\r\n    if True:\r\n        print(request.remote_addr + \" запросил \" + filename)\r\n        return send_from_directory('front', filename)\r\n    else:\r\n        print(request.remote_addr + \" запросил \" + filename + \" - ОТКАЗАНО!\")\r\n\r\nif __name__ == '__main__':\r\n    app.run(port=8080, host='127.0.0.1')\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/server.py b/server.py
+--- a/server.py	(revision fec435d61cee64e8489bd4b4ee5c35bca3061979)
++++ b/server.py	(date 1711122149680)
+@@ -67,7 +67,7 @@
+         is_ok = True # проверка, существует ли пользователь с такой почтой и паролем !!!
+         return jsonify(is_ok)
+ 
+-    return {"responce": False}
++    return {"response": False}
+ 
+ @app.route('/front/<path:filename>')
+ def get_file_in_front(filename):
+Index: .idea/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+new file mode 100644
+--- /dev/null	(date 1711121753276)
++++ b/.idea/.gitignore	(date 1711121753276)
+@@ -0,0 +1,3 @@
++# Default ignored files
++/shelf/
++/workspace.xml

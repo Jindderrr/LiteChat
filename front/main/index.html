@@ -8,10 +8,14 @@
     
 </head>
     <body style="background-color: rgb(255, 180, 130); font-family: Arial; overflow: hidden;">
-        <div id="chat_container" class="chat_container"> </div>
+        <div id="chat_container" class="chat_container">
+            <img src=../front/data/chat_fon.jpg class="chat_fon_img">
+            <div id="message_container" class="messages_container">
+            </div>
+        </div>
         <div id="chat_text_input_container" class="chat_text_input_container"> 
             <textarea id="message_textarea" class="input_box" oninput="autoResize()" rows="1" placeholder=""></textarea>
-            <input type="button" class="send_message_button" value="send">
+            <input type="button" class="send_message_button" value="send" onclick="send_msg()">
         </div>
         <div id="chats_container" class="chats_container">
             

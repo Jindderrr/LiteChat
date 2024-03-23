@@ -1,9 +1,11 @@
 import asyncio, json, websockets
 from threading import Thread
+from data_py import db_session
+from data_py.users import User
 
 
 class WebSocket:
-    def __init__(self, websocket, init_info):
+    def init(self, websocket, init_info):
         self.init_info = init_info
         self.websocket = websocket
         self.honest = check_hones_func(self.init_info)
@@ -38,7 +40,16 @@ def run():
     asyncio.get_event_loop().run_forever()
 
 
+def check_hones_func(user_info: dict):
+    db_session.global_init('db/messenger.db')
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.username == user_info['username']).first()
+    if user is not None:
+        if user.hashed_password == user_info['password_hash']:
+            return True
+    return False
+
+
 connected_clients = []
-check_hones_func = None
 new_msg_func = new_msg
 Thread(target=run).start()

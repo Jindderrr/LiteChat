@@ -2,7 +2,8 @@ import random
 
 from flask import Flask, request, send_from_directory, jsonify
 from werkzeug.security import generate_password_hash
-
+import WS
+import json
 from data_py import db_session
 from data_py.messages import Message
 from data_py.users import User
@@ -122,10 +123,9 @@ def check_registration(path):  # эта функция для обработки
             User.username == request.args.get("my_username")).first()
         scnd_user = db_sess.query(User).filter(
             User.username == request.args.get("another_username")).first()
-        if not fst_user.check_password(pass_hash):
-            return {"response": False, 'error': 'Hash does not match'}
-            chat = Chat(users=f'{fst_user.id};{scnd_user.id}',
-                        type='single')
+        check_password_hash(fst_user, pass_hash)
+        chat = Chat(users=f'{fst_user.id};{scnd_user.id}',
+                    type='single')
         db_sess.add(chat)
         db_sess.commit()
         fst_user.add_chat(chat.id)
@@ -138,8 +138,7 @@ def check_registration(path):  # эта функция для обработки
 
         user = db_sess.query(User).filter(
             User.username == request.args.get('username')).first()
-        if not user.check_password(pass_hash):
-            return {"response": False, 'error': 'Hash does not match'}
+        check_password_hash(user, pass_hash)
         user_chats_id = user.chats.split(';')
         answer = []
         for chat_id in user_chats_id:
@@ -166,6 +165,29 @@ def get_file_in_front(filename):
     else:
         print(request.remote_addr + " запросил " + filename + " - ОТКАЗАНО!")
 
+
+def check_password_hash(user, pass_hash):
+    if user.hashed_password != pass_hash:
+        return {"response": False, 'error': 'Hash does not match'}
+
+
+def new_message(msg, web_socket: WS.WebSocket):
+    msg = json.loads(msg)
+    if web_socket.honest:
+        args = msg["args"]
+        username = web_socket.init_info["username"]
+        if msg["type"] == "send_msg":
+            chat_id = args["chat_id"]
+            msg_text = args["msg_text"]
+            db_sess = db_session.create_session()
+            message = Message(text=msg_text,
+                              sender=username,
+                              chat_id=chat_id)
+            db_sess.add(message)
+            db_sess.commit()
+
+
+WS.new_msg_func = new_message
 
 if __name__ == '__main__':
     db_session.global_init('db/messenger.db')

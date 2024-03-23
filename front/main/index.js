@@ -1,3 +1,17 @@
+let LAST_MSG_ID = 0
+let IS_VERTICAL_MODE = false
+
+
+let WS = new WebSocket("ws://127.0.0.1:5000");
+
+WS.onopen = function() {
+    WS.send(JSON.stringify({"username": cookies["username"], "password_hash": cookies["password_hash"]}))
+}
+
+WS.onmessage = function(event) {
+    console.log("с сервера: " + event.data)
+}
+
 // chats_menu
 let chats = []
 request(`/request/get_my_chats?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}`, function(response) {
@@ -108,7 +122,8 @@ function to_horizontal_mode() {
 }
 
 window.addEventListener('resize', function() {
-    if (window.innerHeight / window.innerWidth > 1) { to_vertical_mode() }
+    IS_VERTICAL_MODE = window.innerHeight / window.innerWidth > 1
+    if (IS_VERTICAL_MODE) { to_vertical_mode() }
     else {to_horizontal_mode()}
 })
 if (window.innerHeight / window.innerWidth > 1) { to_vertical_mode() }
@@ -126,7 +141,8 @@ function newChat() {
 function send_msg() {
     let msgText = document.getElementById("message_textarea").value
     document.getElementById("message_textarea").value = ""
-    request(`/request/send_msg?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&msg_text=${msgText}&chat_id=${chats[SelectedChat]["chat_id"]}`)
+    WS.send({"username": cookies["username"], "password_hash": cookies["password_hash"], "msg_text": msgText, "chat_id": chats[SelectedChat]["chat_id"]})
+    // request(`/request/send_msg?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&msg_text=${msgText}&chat_id=${chats[SelectedChat]["chat_id"]}`)
     autoResize()
     autoScroll()
 }
@@ -146,3 +162,9 @@ function add_msg(msgText, whose_msg) {
     `
     document.getElementById("message_container").innerHTML += html
 }
+
+// function get_updates() {
+//     request(`/request/get_updates?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&current_chat_id=${chats[SelectedChat]["chat_id"]}&last_msg_id=${LAST_MSG_ID}&need_chats_updates=${!IS_VERTICAL_MODE}`, function(response) {
+
+//     })
+// }

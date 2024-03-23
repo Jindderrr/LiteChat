@@ -4,7 +4,9 @@ from flask import Flask, request, send_from_directory, jsonify
 from werkzeug.security import generate_password_hash
 
 from data_py import db_session
+from data_py.messages import Message
 from data_py.users import User
+from data_py.chats import Chat
 
 app = Flask(__name__)
 
@@ -36,14 +38,16 @@ def check_registration(path):  # эта функция для обработки
     if path == "registration/check_email":  # ->->->
         a_email = request.args.get("email")
         db_sess = db_session.create_session()
-        email_is_free = not db_sess.query(User).filter(User.email == a_email).first()  # email свободен?
+        email_is_free = not db_sess.query(User).filter(
+            User.email == a_email).first()  # email свободен?
         print("email is free: " + email_is_free)
         return jsonify(email_is_free)  # <-<-<-
 
     if path == "registration/check_username":  # ->->->
         a_username = request.args.get("username")
         db_sess = db_session.create_session()
-        username_is_free = not db_sess.query(User).filter(User.username == a_username).first()  # username свободен?
+        username_is_free = not db_sess.query(User).filter(
+            User.username == a_username).first()  # username свободен?
         print("username is free: " + username_is_free)
         return jsonify(username_is_free)  # <-<-<-
 
@@ -52,7 +56,9 @@ def check_registration(path):  # эта функция для обработки
         a_username = request.args.get("username")
         # тут надо ещё раз проверить, что всё ок (нет пользователей с такой почтой и username),
         db_sess = db_session.create_session()
-        is_ok = not db_sess.query(User).filter(User.username == a_username).first() and not db_sess.query(User).filter(
+        is_ok = not db_sess.query(User).filter(
+            User.username == a_username).first() and not db_sess.query(
+            User).filter(
             User.email == a_email).first() and "@" not in a_username  # всё ок?
         print(is_ok)
         if is_ok:
@@ -69,6 +75,7 @@ def check_registration(path):  # эта функция для обработки
 
         # тут надо проверить, что код верный,
         is_success = False  # всё ок?
+        hashed_pass = None
         if a_email in USERS_REGISTERING_NOW:
             is_success = int(USERS_REGISTERING_NOW[a_email][0]) == int(a_code)
             print("code is valid - " + str(is_success))
@@ -83,22 +90,71 @@ def check_registration(path):  # эта функция для обработки
                             username=a_username,
                             email=a_email)
                 user.set_password(a_password)
+                hashed_pass = user.hashed_password
                 db_sess.add(user)
                 db_sess.commit()
                 print('user register')
-        return {"response": is_success}
+        return {"response": is_success, 'hash': hashed_pass}
 
     if path == "login":  # от пользователя получены данные для входа
         a_email_username = request.args.get("email-username")
         a_password = request.args.get("password")
         db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(a_email_username == User.email).first()
-        if user is None: user = db_sess.query(User).filter(a_email_username == User.username).first()
-        is_ok = user and user.check_password(
-            a_password)  # проверка, существует ли пользователь с такой почтой и паролем
-        if is_ok is None: is_ok = False
+        user = db_sess.query(User).filter(
+            a_email_username == User.email).first()
+        if user is None:
+            user = db_sess.query(User).filter(
+                a_email_username == User.username).first()
+        is_ok = user and user.check_password(a_password)
+        if is_ok is None:
+            is_ok = False
+            hashed_pass, username, name, email = None, None, None, None
+        else:
+            hashed_pass = user.hashed_password
+            name, email, username = user.name, user.email, user.username
         print(is_ok)
-        return {"response": is_ok}
+        return {"response": is_ok, 'hash': hashed_pass, 'username': username,
+                'name': name, 'email': email}
+    if path == "start_chat":
+        pass_hash = request.args.get("password_hash")
+        db_sess = db_session.create_session()
+        fst_user = db_sess.query(User).filter(
+            User.username == request.args.get("my_username")).first()
+        scnd_user = db_sess.query(User).filter(
+            User.username == request.args.get("another_username")).first()
+        if not fst_user.check_password(pass_hash):
+            return {"response": False, 'error': 'Hash does not match'}
+            chat = Chat(users=f'{fst_user.id};{scnd_user.id}',
+                        type='single')
+        db_sess.add(chat)
+        db_sess.commit()
+        fst_user.add_chat(chat.id)
+        scnd_user.add_chat(chat.id)
+        print(f'added chat: {chat.id}')
+        return
+    if path == 'get_my_chats':  # {"chat_name", "chat_type", "chat_last_message", "number_of_unread_messages"}
+        pass_hash = request.args.get("password_hash")
+        db_sess = db_session.create_session()
+
+        user = db_sess.query(User).filter(
+            User.username == request.args.get('username')).first()
+        if not user.check_password(pass_hash):
+            return {"response": False, 'error': 'Hash does not match'}
+        user_chats_id = user.chats.split(';')
+        answer = []
+        for chat_id in user_chats_id:
+            chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
+            last_mess = \
+                sorted(chat.messages, key=lambda x: x.id, reverse=True)[0]
+            answer.append({'chat_id': chat.id,
+                           "chat_name": chat.users,
+                           "chat_type": chat.type,
+                           "number_of_unread_messages": chat.unread_messages,
+                           "chat_last_message": {
+                               "message_text": last_mess.text,
+                               "message_sender": last_mess.sender,
+                               "message_date": last_mess.date}})
+        return answer
     return {"response": False}
 
 
@@ -112,7 +168,7 @@ def get_file_in_front(filename):
 
 
 if __name__ == '__main__':
-    db_session.global_init('db/chat.db')
+    db_session.global_init('db/messenger.db')
     print("окно регистрации тут - http://127.0.0.1:8080/registration")
     print("окно входа тут - http://127.0.0.1:8080/login")
     app.run(port=8080, host='127.0.0.1')

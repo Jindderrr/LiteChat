@@ -15,6 +15,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     name = sqlalchemy.Column(sqlalchemy.String)
     username = sqlalchemy.Column(sqlalchemy.String, unique=True)
     email = sqlalchemy.Column(sqlalchemy.String, unique=True)
+    chats = sqlalchemy.Column(sqlalchemy.String, default='')
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
 
     def set_password(self, password):
@@ -22,3 +23,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+
+    def add_chat(self, chat_id):
+        self.chats += chat_id if self.chats == '' else f';{chat_id}'

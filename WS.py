@@ -6,6 +6,7 @@ class WebSocket:
     def __init__(self, websocket, init_info):
         self.init_info = init_info
         self.websocket = websocket
+        self.honest = check_hones_func(self.init_info)
 
     def send_msg(self, msgText):
         asyncio.create_task(_send_msg_as(msgText, self.websocket))
@@ -38,5 +39,6 @@ def run():
 
 
 connected_clients = []
+check_hones_func = None
 new_msg_func = new_msg
 Thread(target=run).start()

@@ -1,6 +1,6 @@
 // chats_menu
 let chats = []
-request(`/request/get_my_chats?username=${cookies["username"]}`, function(response) {
+request(`/request/get_my_chats?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}`, function(response) {
     chats = response
     UpdateChats()
 })
@@ -88,7 +88,7 @@ function select_chat(i) {
     elem.style.backgroundColor = SELECTED_CHAT_COLOR
     elem.style.borderRadius = "12px 0px 0px 12px"
 
-    request(`/request/send_msg?username=${cookies["username"]}&msg_text=`)
+    //request(`/request/send_msg?username=${cookies["username"]}&msg_text=`)
 }
 
 //

@@ -123,6 +123,8 @@ def check_registration(path):  # эта функция для обработки
             User.username == request.args.get("my_username")).first()
         scnd_user = db_sess.query(User).filter(
             User.username == request.args.get("another_username")).first()
+        if fst_user.id == scnd_user.id:
+            return {'error': 'can not create chat with yourself'}
         if scnd_user is None:
             return {'error': 'No such user'}
         check_password_hash(fst_user, pass_hash)
@@ -148,9 +150,13 @@ def check_registration(path):  # эта функция для обработки
         answer = []
         for chat_id in user_chats_id:
             chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
+            chat_name = list(map(int, chat.users.split(';')))
+            chat_name = db_sess.query(User).filter(User.id == (
+                chat_name[
+                    1 if chat_name[0] == user.id else 0])).first().username
             if len(chat.messages) == 0:
                 answer.append({'chat_id': chat.id,
-                               "chat_name": chat.users,
+                               "chat_name": chat_name,
                                "chat_type": chat.type,
                                "number_of_unread_messages": chat.unread_messages,
                                "chat_last_message": {
@@ -161,7 +167,7 @@ def check_registration(path):  # эта функция для обработки
                 last_mess = \
                     sorted(chat.messages, key=lambda x: x.id, reverse=True)[0]
                 answer.append({'chat_id': chat.id,
-                               "chat_name": chat.users,
+                               "chat_name": chat_name,
                                "chat_type": chat.type,
                                "number_of_unread_messages": chat.unread_messages,
                                "chat_last_message": {

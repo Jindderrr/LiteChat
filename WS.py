@@ -5,7 +5,7 @@ from data_py.users import User
 
 
 class WebSocket:
-    def init(self, websocket, init_info):
+    def __init__(self, websocket, init_info):
         self.init_info = init_info
         self.websocket = websocket
         self.honest = check_hones_func(self.init_info)

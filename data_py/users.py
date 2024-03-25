@@ -25,4 +25,4 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         return check_password_hash(self.hashed_password, password)
 
     def add_chat(self, chat_id):
-        self.chats += chat_id if self.chats == '' else f';{chat_id}'
+        self.chats += str(chat_id) if self.chats == '' else f';{str(chat_id)}'

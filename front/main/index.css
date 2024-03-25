@@ -1,51 +1,46 @@
 .left_panel_container{
     position: absolute;
-    left: 5px;
-    width: 40px;
-    top: 5px;
-    height: 45px;
-}
-.left_panel_buttons{
-    position: absolute;
-    border-radius: 36%;
-    aspect-ratio: 1;
-    left: 0px;
-    background-color: rgb(98, 203, 0);
-    border: 2px outset white;
-    cursor: pointer;
+    left: 0;
+    width: 50px;
+    top: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(228, 200, 185);
 }
 button:active {
     border-style: inset;
+    transform: scale(0.95);
+}
+.left_panel_buttons{
+    margin: 8%;
+    border-radius: 36%;
+    width: 84%;
+    aspect-ratio: 1;
+    background-color: rgb(150, 150, 150);
+    border: 2px outset white;
+    cursor: pointer;
+}
+.add_chat_button, .settings_button, .change_fon_button {
+    box-shadow: 0 0 8px rgb(0, 0, 0, 0.2);
+    color: #fff;
+    font-size: 30px;
+    text-align: center;
 }
 .add_chat_button {
-    display: inline-block;
-    top: 0%;
-    width: 100%;
-    color: #fff;
-    font-size: 30px;
-    text-align: center;
-    line-height: 10px;
-}
-.settings_button {
-    display: inline-block;
-    top: 100%;
-    width: 100%;
-    color: #fff;
-    font-size: 30px;
-    text-align: center;
-    line-height: 10px;
+    margin-top: 16%;
 }
 .chats_container {
     overflow-y: auto;
     overflow-x: hidden;
     position: absolute;
     width: 35%;
-    min-width: 220px;
     height: 100%;
-    top: 0px;
+    top: 0;
     left: 50px;
-    background-color: rgba(41, 181, 16, 0.342);
-    box-shadow: 0 0 18px rgba(0, 0, 0, 0.3);
+    background-color: rgb(215, 196, 184);
+    box-shadow: 0 80px 18px rgba(0, 0, 0, 0.2);
 }
 .chat_fon_img {
     position: fixed;
@@ -56,63 +51,71 @@ button:active {
     bottom: 0px;
 }
 .chat_button {
-    height: 11.111%;
+    height: calc(12.5% - 20px);
+    width: calc(100% - 20px);
     min-height: 50px;
-}
-.onmouse_div { 
-    position: relative;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: calc(100% - 10px);
-    height: calc(100% - 10px);
+    margin: 10px;
     border-radius: 12px;
     background-color: rgb(0, 0, 0, 0.03);
     cursor: pointer;
-    transition: background-color 0.25s ease;
-    transition: border-radius 0.12s ease;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
-.ico_container {
-    position: relative;
-    height: 100%;
-    aspect-ratio: 1;
+.chats_container_top {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 80px;
+    background-color: rgb(228, 200, 185);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.top_info_container {
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    display: flex;
+    align-items: center;
+}
+.top_text {
+    margin-left: 8px;
+    font-size: 18px;
+}
+.chat_container {
+    position: absolute;
+    top: 80px;
+    height: calc(100% - 80px - 2.2% - 60px);
+    right: 0px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.chat_button_text_container {
+    height: calc(100% - 10px);
+    width: calc(100% - 10px);
+    display: flex;
+    flex-direction: row;
 }
 .chat_ico {
-    position: absolute;
-    top: 10%;
-    left: 10%;
-    height: 80%;
-    width: 80%;
+    height: 100%;
+    aspect-ratio: 1;
     border-radius: 50%;
     background-color:blueviolet;
-    float: left;
 }
-
 .chat_button_text_box {
-    position: absolute;
-    top: 20%;
-    height: 60%;
-    left: 100%;
+    margin-left: 5px;
+    align-self: center;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .chat_button_time_box {
+    align-self: flex-start;
     position: absolute;
-    top: 20%;
-    height: 60%;
-    right: 14px;
+    right: 17px;
     color: rgba(0, 0, 0, 0.5);
     font-size: 14px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.chat_container {
-    position: absolute;
-    top: 0px;
-    height: calc(100% - 50px);
-    right: 0px;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 .messages_container {
     display: flex;
@@ -136,12 +139,12 @@ button:active {
 .my_message {
     right: 2%;
     border-radius: 19px 19px 2px 19px;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(231, 195, 176);
 }
 .no_my_message {
     left: 2%;
     border-radius: 19px 19px 19px 2px;
-    background-color: rgb(171, 171, 171);
+    background-color: rgb(236, 210, 196);
 }.notification_message {
     max-width: 70%;
     padding: 8px;
@@ -149,42 +152,54 @@ button:active {
     margin-bottom: 16px;
     font-size: 14px;
     border-radius: 15px;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(235, 214, 200, 0.5);
 }
 .chat_text_input_container {
     position: absolute;
-    right: 0px;
-    bottom: 0px;
-    height: 50px;
-    max-height: calc(210px + 30px);
-    background-color: white;
-    box-shadow: 0 0 50px rgb(255, 150, 0);
-    border-top: 2px solid rgba(255, 130, 0, 0.25);
+    right: 4%;
+    bottom: 2.5%;
+    max-height: calc(240px);
+    background-color: rgb(232, 222, 215);
+    border-radius: 16px;
+    box-shadow: 0px 0 50px rgb(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
 }
 .input_box {
     position: absolute;
-    left: 15%;
-    bottom: 15px;
-    width: 70%;
+    left: 12px;
+    width: calc(100% - 12px - 105px - 12px);
     height: 40%;
     min-height: 20px;
     max-height: 210px;
-    border: 0px;
     font-size: 20px;
     outline: 0px solid white;
     resize: none; 
     outline: hidden;
     border-width: 0px;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(232, 222, 215);
+}
+.message_right_buttons {
+    position: absolute;
+    right: 5px;
+    width: 100px;
+    display: flex;
+    justify-content: end;
+}
+.smiles_message_button, .send_message_button{
+    cursor: pointer;
+    height: 47px;
+    border-width: 0px;
+    font-size: 16px;
+}   
+.smiles_message_button {
+    width: 43%;
+    background-color: rgb(250, 249, 232);
+    border-radius: 10px 0px 0px 10px;
+    font-size: 22px;
 }
 .send_message_button {
-    position: absolute;
-    right: 10px;
-    height: 48px;
-    aspect-ratio: 2;
-    border: 2px outset white;
-    background-color: aqua;
-    bottom: 2px;
-    border-radius: 5px;
-    max-width: 10%;
+    width: 57%;
+    background-color: rgb(215, 231, 221);
+    border-radius: 0px 16px 16px 0px;
 }

@@ -2,28 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>LiteChat Registration</title>
+    <title>Chat</title>
     <link rel="stylesheet" href=../front/main/index.css>
     <link rel="icon" href="../data/icon.png" type="image/png">
     
 </head>
-    <body style="background-color: rgb(255, 180, 130); font-family: Arial; overflow: hidden;">
+    <body style="background-color: rgb(215, 196, 184); font-family: Arial; overflow: hidden;">
         <div id="chat_container" class="chat_container">
             <img src=../front/data/chat_fon.jpg class="chat_fon_img">
-            <div id="message_container" class="messages_container">
-            </div>
+            <div id="message_container" class="messages_container"> </div>
         </div>
         <div id="chat_text_input_container" class="chat_text_input_container"> 
             <textarea id="message_textarea" class="input_box" oninput="autoResize()" rows="1" placeholder=""></textarea>
-            <input type="button" class="send_message_button" value="send" onclick="send_msg()">
+            <div class="message_right_buttons">
+                <button class="smiles_message_button" onclick=""> 🙂 </button>
+                <button class="send_messae_button" value="send" onclick="send_msg()"> send </button>
+            </div>
         </div>
-        <div id="chats_container" class="chats_container">
-            
+        <div id="chats_container_top" class="chats_container_top">
+            <div class="top_info_container">
+                <img src=/front/main/ico_1.png class="chat_ico">
+                <div id="top_text" class="top_text"> </div>
+            </div>
         </div>
         <div id="left_panel_container" class="left_panel_container">
             <button class="left_panel_buttons add_chat_button" onclick="newChat()">+</button>
             <button class="left_panel_buttons settings_button">i</button>
         </div>
+        <div id="chats_container" class="chats_container"> </div>
+        
     </body>
 </html>
 <script src=../front/base.js></script>

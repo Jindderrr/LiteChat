@@ -19,7 +19,6 @@ request(`/request/get_my_chats?username=${cookies["username"]}&password_hash=${c
     UpdateChats()
 })
 
-
 //message placeholder
 
 const place_holder_text = "message.."
@@ -44,12 +43,11 @@ function printPlaceholder() {
 }
 setTimeout(printPlaceholder, 300)
 
-//------------------------------------------------------------------------------------------------------------------------------------------------
 //chats
 
 const NO_SELECTED_CHAT_COLOR = 'rgb(0, 0, 0, 0.03)'
-const MOUSEOVER_CHAT_COLOR = 'rgb(0, 0, 0, 0.15)'
-const SELECTED_CHAT_COLOR = 'rgb(0, 160, 0, 0.3)'
+const MOUSEOVER_CHAT_COLOR = 'rgb(0, 0, 0, 0.12)'
+const SELECTED_CHAT_COLOR = 'rgb(110, 90, 80, 0.3)'
 let SelectedChat = -1
 
 function mouse_over(id) {
@@ -66,19 +64,12 @@ function mouse_out(id) {
 function UpdateChats() {
     for (let i = 0; i < chats.length; i++) {
         let html = `
-            <div class="chat_button"> 
-                <div id="onmouse_div_${i}" class="onmouse_div" onmouseover="mouse_over(${i})" onmouseout="mouse_out(${i})" onclick="select_chat(${i})"> 
-                <div id="chat_text_box__${i}" class="chat_button_time_box"> <i> ${chats[i]["chat_last_message"]["message_date"]} </i> </div>
-                    <div class="ico_container"> 
-                        <img src=/front/main/ico_${Math.floor(Math.random() * 2)}.png class="chat_ico"> 
-                        
-                        <div id="chat_name_text_box_${i}" class="chat_button_text_box"> <nobr><b>${chats[i]["chat_name"]}</b></nobr></div>
-                        <div id="chat_message_text_box_${i}" class="chat_button_text_box" style="font-size:14px"> <nobr><br>${chats[i]["chat_last_message"]["message_text"]}</nobr></div>
-                        
-                    </div>
-                    
+            <div id="onmouse_div_${i}" class="chat_button" onmouseover="mouse_over(${i})" onmouseout="mouse_out(${i})" onclick="select_chat(${i})"> 
+                <div class="chat_button_text_container">
+                    <img src=/front/main/ico_${Math.floor(Math.random() * 2)}.png class="chat_ico"> 
+                    <div id="chat_name_text_box_${i}" class="chat_button_text_box"> <nobr><b>${chats[i]["chat_name"]}</b><br>${chats[i]["chat_last_message"]["message_text"]}</nobr></div>
+                    <div id="chat_text_box__${i}" class="chat_button_time_box"> <i> ${chats[i]["chat_last_message"]["message_date"]} </i> </div>
                 </div>
-                <div class="chat_button"">
             </div>
         `
         document.getElementById("chats_container").innerHTML += html
@@ -96,13 +87,13 @@ function select_chat(i) {
         let elem = document.getElementById("onmouse_div_" + SelectedChat)
         elem.style.backgroundColor = NO_SELECTED_CHAT_COLOR
         elem.style.borderRadius = "12px"
+
     }
     SelectedChat = i
     elem = document.getElementById("onmouse_div_" + i)
     elem.style.backgroundColor = SELECTED_CHAT_COLOR
-    elem.style.borderRadius = "12px 0px 0px 12px"
-
-    //request(`/request/send_msg?username=${cookies["username"]}&msg_text=`)
+    document.getElementById("top_text").innerHTML = "<b>" + chats[SelectedChat]["chat_name"] + "</b>"
+    //elem.style.borderRadius = "12px 0px 0px 12px"
 }
 
 //
@@ -111,14 +102,16 @@ function to_vertical_mode() {
     document.getElementById("left_panel_container").style.visibility = "hidden"
     document.getElementById("chats_container").style.visibility = "hidden"
     document.getElementById("chat_container").style.width = "100%"
-    document.getElementById("chat_text_input_container").style.width = "100%"
+    document.getElementById("chats_container_top").style.width = "100%"
+    document.getElementById("chat_text_input_container").style.width = "92%"
 }
 
 function to_horizontal_mode() {
     document.getElementById("left_panel_container").style.visibility = "visible"
     document.getElementById("chats_container").style.visibility = "visible"
     document.getElementById("chat_container").style.width = "calc(100% - 35% - 50px)"
-    document.getElementById("chat_text_input_container").style.width = "calc(100% - 35% - 50px)"
+    document.getElementById("chats_container_top").style.width = "calc(100% - 35% - 50px)"
+    document.getElementById("chat_text_input_container").style.width = "calc(92% - 35% - 50px)"
 }
 
 window.addEventListener('resize', function() {
@@ -141,7 +134,7 @@ function newChat() {
 function send_msg() {
     let msgText = document.getElementById("message_textarea").value
     document.getElementById("message_textarea").value = ""
-    WS.send({"username": cookies["username"], "password_hash": cookies["password_hash"], "msg_text": msgText, "chat_id": chats[SelectedChat]["chat_id"]})
+    WS.send({"type": "send_msg", "args": {"msg_text": msgText, "chat_id": chats[SelectedChat]["chat_id"]}})
     // request(`/request/send_msg?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&msg_text=${msgText}&chat_id=${chats[SelectedChat]["chat_id"]}`)
     autoResize()
     autoScroll()
@@ -162,9 +155,3 @@ function add_msg(msgText, whose_msg) {
     `
     document.getElementById("message_container").innerHTML += html
 }
-
-// function get_updates() {
-//     request(`/request/get_updates?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&current_chat_id=${chats[SelectedChat]["chat_id"]}&last_msg_id=${LAST_MSG_ID}&need_chats_updates=${!IS_VERTICAL_MODE}`, function(response) {
-
-//     })
-// }

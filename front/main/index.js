@@ -93,6 +93,7 @@ function select_chat(i) {
     elem = document.getElementById("onmouse_div_" + i)
     elem.style.backgroundColor = SELECTED_CHAT_COLOR
     document.getElementById("top_text").innerHTML = "<b>" + chats[SelectedChat]["chat_name"] + "</b>"
+    WS.send(JSON.stringify({"type": "change_chat", "args": [{"selected_chat_id": chats[SelectedChat]["chat_id"]}]}))
     //elem.style.borderRadius = "12px 0px 0px 12px"
 }
 
@@ -134,7 +135,7 @@ function newChat() {
 function send_msg() {
     let msgText = document.getElementById("message_textarea").value
     document.getElementById("message_textarea").value = ""
-    WS.send({"type": "send_msg", "args": {"msg_text": msgText, "chat_id": chats[SelectedChat]["chat_id"]}})
+    WS.send(JSON.stringify({"type": "send_msg", "args": {"msg_text": msgText, "chat_id": chats[SelectedChat]["chat_id"]}}))
     // request(`/request/send_msg?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&msg_text=${msgText}&chat_id=${chats[SelectedChat]["chat_id"]}`)
     autoResize()
     autoScroll()
@@ -155,3 +156,9 @@ function add_msg(msgText, whose_msg) {
     `
     document.getElementById("message_container").innerHTML += html
 }
+
+// function get_updates() {
+//     request(`/request/get_updates?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&current_chat_id=${chats[SelectedChat]["chat_id"]}&last_msg_id=${LAST_MSG_ID}&need_chats_updates=${!IS_VERTICAL_MODE}`, function(response) {
+
+//     })
+// }

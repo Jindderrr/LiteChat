@@ -220,6 +220,7 @@ def new_message(msg, web_socket: WS.WebSocket):
 
             answer['last_mess_id'] = {'id': chat.messages[-1].id}
             web_socket.send_msg(str(answer))
+            print('chats have sent')
 
 
 WS.new_msg_func = new_message

@@ -93,7 +93,7 @@ function select_chat(i) {
     elem = document.getElementById("onmouse_div_" + i)
     elem.style.backgroundColor = SELECTED_CHAT_COLOR
     document.getElementById("top_text").innerHTML = "<b>" + chats[SelectedChat]["chat_name"] + "</b>"
-    WS.send(JSON.stringify({"type": "change_chat", "args": [{"selected_chat_id": chats[SelectedChat]["chat_id"]}]}))
+    WS.send(JSON.stringify({"type": "change_chat", "args": {"selected_chat_id": chats[SelectedChat]["chat_id"]}}))
     //elem.style.borderRadius = "12px 0px 0px 12px"
 }
 

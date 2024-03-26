@@ -43,7 +43,8 @@ def run():
 def check_hones_func(user_info: dict):
     db_session.global_init('db/messenger.db')
     db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(User.username == user_info['username']).first()
+    user = db_sess.query(User).filter(
+        User.username == user_info['username']).first()
     if user is not None:
         if user.hashed_password == user_info['password_hash']:
             return True

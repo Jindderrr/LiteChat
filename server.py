@@ -194,18 +194,32 @@ def check_password_hash(user, pass_hash):
 
 def new_message(msg, web_socket: WS.WebSocket):
     msg = json.loads(msg)
+    print(msg)
     if web_socket.honest:
         args = msg["args"]
-        username = web_socket.init_info["username"]
-        if msg["type"] == "send_msg":
+        msg_type = msg["type"]
+        db_sess = db_session.create_session()
+        if msg_type == "send_msg":
+            username = web_socket.init_info["username"]
             chat_id = args["chat_id"]
             msg_text = args["msg_text"]
-            db_sess = db_session.create_session()
             message = Message(text=msg_text,
                               sender=username,
                               chat_id=chat_id)
             db_sess.add(message)
             db_sess.commit()
+            print(f'message added: {message.id}')
+        elif msg_type == 'change_chat':
+            chat = db_sess.query(Chat).filter(
+                Chat.id == args['selected_chat_id']).first()
+            answer = {'last_mess_id': {}, 'all_messages': []}
+            for message in chat.messages:
+                answer['all_messages'].append({'msg_text': message.text,
+                                               'msg_time': message.date,
+                                               'msg_sender': message.sender})
+
+            answer['last_mess_id'] = {'id': chat.messages[-1].id}
+            web_socket.send_msg(str(answer))
 
 
 WS.new_msg_func = new_message

@@ -1,7 +1,10 @@
 import random
 
 from flask import Flask, request, send_from_directory, jsonify
-from werkzeug.security import generate_password_hash
+from config import EMAIL_LOGIN, EMAIL_PASSWORD
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
 import WS
 import json
 from data_py import db_session
@@ -65,8 +68,22 @@ def check_registration(path):  # эта функция для обработки
         if is_ok:
             code = random.randint(100000, 999999)  # код подтверждения
             # отправить письмо по почте с кодом подтверждения.
-            # пока не отправляем, а просто выводим в консоль
-            print(f"{a_email}: код подтверждения отпрален на почту ({code})")
+            msg = MIMEText(f'{code}', 'plain', 'utf-8')
+            msg['Subject'] = Header('Подтверждение почты', 'utf-8')
+            msg['From'] = EMAIL_LOGIN
+            msg['To'] = a_email
+
+            smtp_server = smtplib.SMTP('smtp.yandex.ru', 587)
+            try:
+                smtp_server.starttls()
+                smtp_server.login(EMAIL_LOGIN, EMAIL_PASSWORD)
+                smtp_server.sendmail(EMAIL_LOGIN, a_email, msg.as_string())
+                print(
+                    f"{a_email}: код подтверждения отпрален на почту ({code})")
+            except Exception as error:
+                print('ERROR:', error)
+            finally:
+                smtp_server.close()
             USERS_REGISTERING_NOW[a_email] = (code, a_username)
         return {"response": is_ok}
 

@@ -9,6 +9,7 @@ class WebSocket:
         self.init_info = init_info
         self.websocket = websocket
         self.honest = check_hones_func(self.init_info)
+        self.selected_chat_id = None
 
     def send_msg(self, msgText):
         asyncio.create_task(_send_msg_as(msgText, self.websocket))

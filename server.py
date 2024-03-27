@@ -209,18 +209,27 @@ def new_message(msg, web_socket: WS.WebSocket):
             db_sess.add(message)
             db_sess.commit()
             print(f'message added: {message.id}')
+            aasitc = [sess for sess in WS.connected_clients if
+                      sess.selected_chat_id == chat_id]
+            for sess in aasitc:
+                sess.send_msg(json.dumps({"type": "new_msg_in_your_chat",
+                                          "message": {"msg_text": msg_text,
+                                                      "msg_sender": username,
+                                                      "msg_time": str(
+                                                          message.date)}}))
         elif msg_type == 'change_chat':
             chat = db_sess.query(Chat).filter(
                 Chat.id == args['selected_chat_id']).first()
             answer = {'last_mess_id': {}, 'all_messages': []}
             for message in chat.messages:
                 answer['all_messages'].append({'msg_text': message.text,
-                                               'msg_time': message.date,
+                                               'msg_time': str(message.date),
                                                'msg_sender': message.sender})
 
             answer['last_mess_id'] = {'id': chat.messages[-1].id}
-            web_socket.send_msg(str(answer))
+            web_socket.send_msg(json.dumps(answer))
             print('chats have sent')
+            web_socket.selected_chat_id = args['selected_chat_id']
 
 
 WS.new_msg_func = new_message

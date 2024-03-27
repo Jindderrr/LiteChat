@@ -28,9 +28,6 @@ db_sess = db_session.create_session()
 # db_sess.add(message)
 # db_sess.add(message1)
 # db_sess.commit()
-chat = db_sess.query(Chat).first()
-for message in chat.messages:
-    print(f'txt {message.text}', f'time {message.date}',
-          f'sender {message.sender}')
-print('last_mess', chat.messages[-1].text)
-print(str({'a': 1, 1: 'a'}))
+if db_sess.query(Chat).filter(Chat.users == '1;2').first():
+    if db_sess.query(Chat).filter(Chat.users == '2;1').first():
+        print(1)

@@ -123,6 +123,9 @@ def check_registration(path):  # эта функция для обработки
             User.username == request.args.get("my_username")).first()
         scnd_user = db_sess.query(User).filter(
             User.username == request.args.get("another_username")).first()
+        if db_sess.query(Chat).filter(
+                Chat.users == f'{fst_user.id};{scnd_user.id}').first():
+            return {'error': 'this chat has already been created'}
         if fst_user.id == scnd_user.id:
             return {'error': 'can not create chat with yourself'}
         if scnd_user is None:

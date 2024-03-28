@@ -175,7 +175,7 @@ def check_registration(path):  # эта функция для обработки
             chat_name = list(map(int, chat.users.split(';')))
             chat_name = db_sess.query(User).filter(User.id == (
                 chat_name[
-                    1 if chat_name[0] == user.id else 0])).first().username
+                    1 if chat_name[0] == user.id else 0])).first().name
             if len(chat.messages) == 0:
                 answer.append({'chat_id': chat.id,
                                "chat_name": chat_name,

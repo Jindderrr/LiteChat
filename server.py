@@ -224,6 +224,10 @@ def new_message(msg, web_socket: WS.WebSocket):
         if msg_type == "send_msg":
             username = web_socket.init_info["username"]
             chat_id = args["chat_id"]
+            user = db_sess.query(User).filter(
+                User.username == username).first()
+            check_user_chat(user, chat_id)
+
             msg_text = args["msg_text"]
             message = Message(text=msg_text,
                               sender=username,
@@ -242,16 +246,27 @@ def new_message(msg, web_socket: WS.WebSocket):
         elif msg_type == 'change_chat':
             chat = db_sess.query(Chat).filter(
                 Chat.id == args['selected_chat_id']).first()
-            answer = {'last_mess_id': {}, 'all_messages': []}
+            answer = {'last_mess_id': {}, 'all_messages': [],
+                      'type': 'change_chat_answer'}
             for message in chat.messages:
                 answer['all_messages'].append({'msg_text': message.text,
                                                'msg_time': str(message.date),
                                                'msg_sender': message.sender})
 
-            answer['last_mess_id'] = {'id': chat.messages[-1].id}
+            if len(chat.messages) > 0:
+                answer['last_mess_id'] = {'id': chat.messages[-1].id}
+            else:
+                answer['last_mess_id'] = {'id': None}
             web_socket.send_msg(json.dumps(answer))
             print('chats have sent')
             web_socket.selected_chat_id = args['selected_chat_id']
+
+
+def check_user_chat(user: User, chat_id: int):
+    user_chats = user.chats.split(';')
+    if str(chat_id) in user_chats:
+        print('Successful check user is right to send')
+    return {'error': 'this user has not rights for sending in this chat'}
 
 
 WS.new_msg_func = new_message

@@ -1,3 +1,15 @@
+::placeholder {
+    color: var(--msg-input-placeholder-color);
+    opacity: 1;
+  }
+body {
+    background-color: var(--chat-color);
+    transition: background-color 0.3s;
+    color: var(--text_color);
+    transition: color 0.3s;
+    font-family: Arial;
+    overflow: hidden;
+}
 .left_panel_container{
     position: absolute;
     left: 0;
@@ -7,7 +19,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: rgb(228, 200, 185);
+    background-color: var(--left-panel-color);
+    transition: background-color 0.3s;
 }
 button:active {
     border-style: inset;
@@ -18,13 +31,13 @@ button:active {
     border-radius: 36%;
     width: 84%;
     aspect-ratio: 1;
-    background-color: rgb(150, 150, 150);
-    border: 2px outset white;
+    background-color: var(--left-panel-buttons-color);
+    transition: background-color 0.3s;
+    color: var(--left-panel-buttons-text-color);
+    transition: color 0.3s;
+    border: 2px outset var(--left-panel-buttons-text-color);
     cursor: pointer;
-}
-.add_chat_button, .settings_button, .change_fon_button {
     box-shadow: 0 0 8px rgb(0, 0, 0, 0.2);
-    color: #fff;
     font-size: 30px;
     text-align: center;
 }
@@ -39,13 +52,14 @@ button:active {
     height: 100%;
     top: 0;
     left: 50px;
-    background-color: rgb(215, 196, 184);
+    background-color: var(--chats-container-color);
+    transition: background-color 0.3s;
     box-shadow: 0 80px 18px rgba(0, 0, 0, 0.2);
 }
 .chat_fon_img {
     position: fixed;
     z-index: -1;
-    width: 100%;
+    width: 65%;
     min-height: 100%;
     opacity: 10%;
     bottom: 0px;
@@ -68,7 +82,8 @@ button:active {
     top: 0;
     right: 0;
     height: 80px;
-    background-color: rgb(228, 200, 185);
+    background-color: var(--chat-top-info-color);
+    transition: background-color 0.3s;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: center;
@@ -139,12 +154,14 @@ button:active {
 .my_message {
     right: 2%;
     border-radius: 19px 19px 2px 19px;
-    background-color: rgb(231, 195, 176);
+    background-color: var(--my-msg-color);
+    transition: background-color 0.3s;
 }
 .no_my_message {
     left: 2%;
     border-radius: 19px 19px 19px 2px;
-    background-color: rgb(236, 210, 196);
+    background-color: var(--no-my-msg-color);
+    transition: background-color 0.3s;
 }.notification_message {
     max-width: 70%;
     padding: 8px;
@@ -159,7 +176,8 @@ button:active {
     right: 4%;
     bottom: 2.5%;
     max-height: calc(240px);
-    background-color: rgb(232, 222, 215);
+    background-color: var(--msg-input-color);
+    transition: background-color 0.3s;
     border-radius: 16px;
     box-shadow: 0px 0 50px rgb(0, 0, 0, 0.1);
     display: flex;
@@ -177,7 +195,8 @@ button:active {
     resize: none; 
     outline: hidden;
     border-width: 0px;
-    background-color: rgb(232, 222, 215);
+    background-color: var(--msg-input-color);
+    transition: background-color 0.3s;
 }
 .message_right_buttons {
     position: absolute;
@@ -194,12 +213,14 @@ button:active {
 }   
 .smiles_message_button {
     width: 43%;
-    background-color: rgb(250, 249, 232);
+    background-color: var(--emoji-button-color);
+    transition: background-color 0.3s;
     border-radius: 10px 0px 0px 10px;
     font-size: 22px;
 }
 .send_message_button {
     width: 57%;
-    background-color: rgb(215, 231, 221);
+    background-color: var(--send-button-color);
+    transition: background-color 0.3s;
     border-radius: 0px 16px 16px 0px;
 }

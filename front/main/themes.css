@@ -1,0 +1,90 @@
+.beige-ping-theme {
+    --chat-color: rgb(215, 196, 184);
+    --chat-top-info-color: rgb(228, 200, 185);
+    --chats-container-color: rgb(215, 196, 184);
+    --msg-input-color: rgb(232, 222, 215);
+    --msg-input-placeholder-color: #373737cc;
+    --text_color: black;
+    --left-panel-color: rgb(228, 200, 185);
+    --left-panel-buttons-color: rgb(150, 150, 150);
+    --left-panel-buttons-text-color: white;
+    --send-button-color: rgb(215, 231, 221);
+    --emoji-button-color: rgb(250, 249, 232);
+    --my-msg-color: rgb(232, 199, 182);
+    --no-my-msg-color: rgb(229, 194, 177);
+}
+.dark-theme {
+    --chat-color: rgb(4, 5, 10);
+    --chat-top-info-color: rgb(40, 40, 40);
+    --chats-container-color: rgb(22, 22, 28);
+    --msg-input-color: rgb(60, 60, 60);
+    --msg-input-placeholder-color: rgba(255, 255, 255, 0.4);
+    --text_color: rgb(210, 210, 210);
+    --left-panel-color: rgb(28, 28, 28);
+    --left-panel-buttons-color: rgb(55, 55, 55);
+    --left-panel-buttons-text-color: rgb(206, 206, 206);
+    --send-button-color: rgb(47, 78, 59);
+    --emoji-button-color: rgb(90, 86, 45);
+    --my-msg-color: rgb(138, 138, 138);
+    --no-my-msg-color: rgb(64, 64, 64);
+}
+.light-theme {
+    --chat-color: rgb(226, 226, 227);
+    --chat-top-info-color: rgb(220, 220, 220);
+    --chats-container-color: rgb(235, 235, 235);
+    --msg-input-color: rgb(222, 222, 222);
+    --msg-input-placeholder-color: rgba(0, 0, 0, 0.7);
+    --text_color: black;
+    --left-panel-color: rgb(245, 245, 245);
+    --left-panel-buttons-color: rgb(230, 230, 230);
+    --left-panel-buttons-text-color: rgb(150, 150, 150);
+    --send-button-color: rgb(184, 210, 195);
+    --emoji-button-color: rgb(233, 228, 182);
+    --my-msg-color: white;
+    --no-my-msg-color: rgb(243, 243, 243);
+}
+.purple-theme {
+    --chat-color: rgb(192, 116, 188);
+    --chat-top-info-color: rgb(225, 80, 208);
+    --chats-container-color: rgb(195, 60, 190);
+    --msg-input-color: rgb(255, 156, 240);
+    --msg-input-placeholder-color: rgba(0, 0, 0, 0.7);
+    --text_color: black;
+    --left-panel-color: rgb(223, 94, 210);
+    --left-panel-buttons-color: rgb(205, 45, 200);
+    --left-panel-buttons-text-color: rgb(0, 0, 0);
+    --send-button-color: rgb(215, 105, 195);
+    --emoji-button-color: rgb(205, 150, 190);
+    --my-msg-color: rgb(240, 0, 230);
+    --no-my-msg-color: rgb(220, 0, 210);
+}
+.green-theme {
+    --chat-color: rgb(103, 194, 102);
+    --chat-top-info-color: rgb(51, 229, 51);
+    --chats-container-color: rgb(47, 206, 42);
+    --msg-input-color: rgb(188, 253, 189);
+    --msg-input-placeholder-color: rgba(0, 0, 0, 0.7);
+    --text_color: black;
+    --left-panel-color: rgb(94, 223, 107);
+    --left-panel-buttons-color: rgb(45, 205, 53);
+    --left-panel-buttons-text-color: rgb(221, 221, 221);
+    --send-button-color: rgb(112, 215, 105);
+    --emoji-button-color: rgb(157, 205, 150);
+    --my-msg-color: rgb(0, 240, 76);
+    --no-my-msg-color: rgb(11, 220, 0);
+}
+.blue-theme {
+    --chat-color: rgb(102, 142, 194);
+    --chat-top-info-color: rgb(50, 125, 220);
+    --chats-container-color: rgb(50, 145, 210);
+    --msg-input-color: rgb(170, 210, 255);
+    --msg-input-placeholder-color: rgba(0, 0, 0, 0.7);
+    --text_color: black;
+    --left-panel-color: rgb(95, 145, 225);
+    --left-panel-buttons-color: rgb(45, 150, 215);
+    --left-panel-buttons-text-color: rgb(221, 221, 221);
+    --send-button-color: rgb(145, 190, 245);
+    --emoji-button-color: rgb(150, 178, 205);
+    --my-msg-color: rgb(0, 136, 240);
+    --no-my-msg-color: rgb(0, 161, 220);
+}

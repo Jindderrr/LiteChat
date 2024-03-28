@@ -1,15 +1,35 @@
 let LAST_MSG_ID = 0
 let IS_VERTICAL_MODE = false
+let LAST_MSG_INEX = 0
+if (getCookie("theme") == undefined) { setCookie("theme", 0) }
+if (getCookie("nfon") == undefined) { setCookie("nfon", 0) }
 
-
-let WS = new WebSocket("ws://127.0.0.1:5000");
+let WS = new WebSocket("ws://127.0.0.1:5000")
 
 WS.onopen = function() {
     WS.send(JSON.stringify({"username": cookies["username"], "password_hash": cookies["password_hash"]}))
 }
 
 WS.onmessage = function(event) {
-    console.log("с сервера: " + event.data)
+    
+    let data = JSON.parse(event.data)
+    console.log(data)
+    if (data["type"] == "change_chat_answer") {
+        document.getElementById("message_container").innerHTML= ""
+        LAST_MSG_INDEX = 0
+        for (let msg of data["all_messages"]) {
+            add_msg(msg["msg_text"], msg["msg_sender"])
+            console.log(msg["msg_text"])
+        }
+        scrollChatDown()
+    } else if (data["type"] == "new_msg_in_your_chat") {
+        add_msg(data["message"]["msg_text"], data["message"]["msg_sender"])
+        scrollChatDown()
+    }
+}
+
+function scrollChatDown() {
+    document.getElementById("chat_container").scrollBy(0, document.getElementById("chat_container").scrollHeight)
 }
 
 // chats_menu
@@ -29,6 +49,23 @@ function autoResize() {
     textarea.style.height = textarea.scrollHeight + 0 + 'px'
 }
 autoResize()
+
+
+function changeFon() {
+    let fon_index = Number(cookies["nfon"])
+    fon_index += 1
+    if (fon_index == NFONS) { fon_index = 0 }
+    document.getElementById("chat_fon_img").src = "../front/data/chat_fon" + fon_index + ".jpg"
+    setCookie("nfon", fon_index)
+} document.getElementById("chat_fon_img").src = "../front/data/chat_fon" + cookies["nfon"] + ".jpg"
+
+function changeTheme() {
+    document.documentElement.classList.remove(THEMES_CLASSES[cookies["theme"]])
+    let theme = Number(getCookie("theme")) + 1
+    if (theme == THEMES_CLASSES.length) {theme = 0}
+    document.documentElement.classList.add(THEMES_CLASSES[theme])
+    setCookie("theme", theme)
+} document.documentElement.classList.add(THEMES_CLASSES[cookies["theme"]])
 
 function printPlaceholder() {
     let elem = document.getElementById("message_textarea")
@@ -142,23 +179,32 @@ function send_msg() {
 }
 
 function autoScroll() {
-    let scrollingDiv = document.getElementById('chat_container');
+    let scrollingDiv = document.getElementById('chat_container')
     scrollingDiv.scrollTop = scrollingDiv.scrollHeight
 }
 
-function add_msg(msgText, whose_msg) {
+
+let LAST_MSG_SENDER
+function add_msg(msgText, sender_username) {
+    let whose_msg = Number(cookies["username"] != sender_username)
+    let style = ''
+    // if (LAST_MSG_SENDER == sender_username) {
+    //     //alert("!!!")
+    //     if (whose_msg == cookies["username"]) {
+    //         style = '19px 2px 2px 19px'
+    //     } else {
+    //         style = '2px 19px 19px 2px'
+    //     }
+    // }
+    LAST_MSG_INDEX += 1
     let html = `
         <div class="message_box" style="justify-content: ${["end", "start", "center"][whose_msg]};">
-            <div class="${["my_message", "no_my_message", "notification_message"][whose_msg]}">
+            <div id="message_${LAST_MSG_INDEX}" class="${["my_message", "no_my_message", "notification_message"][whose_msg]}">
                 ${msgText}
             </div>
         </div>
     `
     document.getElementById("message_container").innerHTML += html
+    //document.getElementById("message_" + LAST_MSG_INDEX).style.borderRadius = style
+    LAST_MSG_SENDER = sender_username
 }
-
-// function get_updates() {
-//     request(`/request/get_updates?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&current_chat_id=${chats[SelectedChat]["chat_id"]}&last_msg_id=${LAST_MSG_ID}&need_chats_updates=${!IS_VERTICAL_MODE}`, function(response) {
-
-//     })
-// }

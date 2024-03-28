@@ -75,8 +75,8 @@ function send() {
                         setCookie("email", email, 30)
                         setCookie("username", username, 30)
                         setCookie("name", name, 30)
-                        alert(response["hash"])
                         setCookie("password_hash", response["hash"], 30)
+                        setRandomTheme()
                         window.location.assign("./")
                     }
                 })

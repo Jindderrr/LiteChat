@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <title>Chat</title>
     <link rel="stylesheet" href=../front/main/index.css>
+    <link rel="stylesheet" href=../front/main/themes.css>
     <link rel="icon" href="../data/icon.png" type="image/png">
     
 </head>
-    <body style="background-color: rgb(215, 196, 184); font-family: Arial; overflow: hidden;">
+    <body>
         <div id="chat_container" class="chat_container">
-            <img src=../front/data/chat_fon.jpg class="chat_fon_img">
+            <img id="chat_fon_img" src=../front/data/chat_fon.jpg class="chat_fon_img">
             <div id="message_container" class="messages_container"> </div>
         </div>
         <div id="chat_text_input_container" class="chat_text_input_container"> 
@@ -27,7 +28,9 @@
         </div>
         <div id="left_panel_container" class="left_panel_container">
             <button class="left_panel_buttons add_chat_button" onclick="newChat()">+</button>
-            <button class="left_panel_buttons settings_button">i</button>
+            <button class="left_panel_buttons">i</button>
+            <button class="left_panel_buttons" onclick="changeTheme()">t</button>
+            <button class="left_panel_buttons" onclick="changeFon()">f</button>
         </div>
         <div id="chats_container" class="chats_container"> </div>
         

@@ -46,3 +46,9 @@ function updateCookieVar() {
     })
 }
 updateCookieVar()
+const THEMES_CLASSES = ["beige-ping-theme", "dark-theme", "light-theme", "purple-theme", "green-theme", "blue-theme"]
+const NFONS = 5
+function setRandomTheme() {
+    setCookie("theme", Math.floor(Math.random() * THEMES_CLASSES.length))
+    setCookie("nfon", Math.floor(Math.random() * NFONS))
+}

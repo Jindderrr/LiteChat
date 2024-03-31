@@ -271,8 +271,27 @@ def check_user_chat(user: User, chat_id: int):
 
 WS.new_msg_func = new_message
 
+
+def create_bot_creator():
+    db_sess = db_session.create_session()
+    bot_creator = db_sess.query(User).filter(
+        User.username == 'bot_creator').first()
+    print(bot_creator)
+    if bot_creator:
+        pass
+    else:
+        bot_creator = User(bot=True,
+                           username='bot_creator',
+                           name='Bot Creator',
+                           )
+        bot_creator.set_token()
+        db_sess.add(bot_creator)
+        db_sess.commit()
+
+
 if __name__ == '__main__':
     db_session.global_init('db/messenger.db')
+    create_bot_creator()
     print("окно регистрации тут - http://127.0.0.1:8080/registration")
     print("окно входа тут - http://127.0.0.1:8080/login")
     app.run(port=8080, host='127.0.0.1')

@@ -28,6 +28,9 @@ db_sess = db_session.create_session()
 # db_sess.add(message)
 # db_sess.add(message1)
 # db_sess.commit()
-if db_sess.query(Chat).filter(Chat.users == '1;2').first():
-    if db_sess.query(Chat).filter(Chat.users == '2;1').first():
-        print(1)
+bot = User(name='name',
+           username='username1',
+           bot=True)
+bot.set_token()
+db_sess.add(bot)
+db_sess.commit()

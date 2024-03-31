@@ -1,4 +1,5 @@
 import random
+from email.mime.multipart import MIMEMultipart
 
 from flask import Flask, request, send_from_directory, jsonify
 from config import EMAIL_LOGIN, EMAIL_PASSWORD
@@ -67,11 +68,21 @@ def check_registration(path):  # эта функция для обработки
         print(is_ok)
         if is_ok:
             code = random.randint(100000, 999999)  # код подтверждения
-            # отправить письмо по почте с кодом подтверждения.
-            msg = MIMEText(f'{code}', 'plain', 'utf-8')
+
+            html_template = open(
+                'front/registration/code_registration.html').read()
+
+            msg = MIMEMultipart("alternative")
             msg['Subject'] = Header('Подтверждение почты', 'utf-8')
             msg['From'] = EMAIL_LOGIN
             msg['To'] = a_email
+
+            text_part = MIMEText(str(code), 'plain', 'utf-8')
+            html_part = MIMEText(html_template.format(code=code), 'html',
+                                 'utf-8')
+
+            msg.attach(text_part)
+            msg.attach(html_part)
 
             smtp_server = smtplib.SMTP('smtp.yandex.ru', 587)
             try:
@@ -79,11 +90,12 @@ def check_registration(path):  # эта функция для обработки
                 smtp_server.login(EMAIL_LOGIN, EMAIL_PASSWORD)
                 smtp_server.sendmail(EMAIL_LOGIN, a_email, msg.as_string())
                 print(
-                    f"{a_email}: код подтверждения отпрален на почту ({code})")
+                    f"{a_email}: код подтверждения отправлен на почту ({code})")
             except Exception as error:
                 print('ERROR:', error)
             finally:
                 smtp_server.close()
+
             USERS_REGISTERING_NOW[a_email] = (code, a_username)
         return {"response": is_ok}
 

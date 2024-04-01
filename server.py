@@ -18,6 +18,32 @@ app = Flask(__name__)
 USERS_REGISTERING_NOW = {}
 
 
+@app.route('/bot/<path:path>')
+def bot_http_api(path):
+    db_sess = db_session.create_session()
+    bot_token = request.args.get("token")
+    bot = db_sess.query(User).filter(
+        User.token == bot_token).first()# вместо "None" - ссылка на бота из таблицы
+    if bot is not None:  # если есть бот с таким токеном
+        if path == "get_msgs":
+            last_id = int(request.args.get("last_id"))
+            bot_chats = tuple(map(int, bot.chats.split(';')))
+            answer = []
+            for chat_id in bot_chats:
+                chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
+                messages = chat.messages[last_id:]
+                for mess in messages:
+                    answer.append(
+                        {"sender": mess.sender,
+                         "text": mess.text,
+                         "date": str(mess.date),
+                         "id": mess.id})
+
+            # answer - сообщения полученные ботом, id которых больше last_id
+            return answer
+    return
+
+
 @app.route('/login')
 def login_page():
     with open("front/login/index.html") as f:
@@ -233,6 +259,7 @@ def new_message(msg, web_socket: WS.WebSocket):
         args = msg["args"]
         msg_type = msg["type"]
         db_sess = db_session.create_session()
+
         if msg_type == "send_msg":
             username = web_socket.init_info["username"]
             chat_id = args["chat_id"]

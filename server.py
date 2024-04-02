@@ -37,22 +37,20 @@ def bot_http_api(path):
                         {"sender": mess.sender,
                          "text": mess.text,
                          "date": str(mess.date),
-                         "id": mess.id})
+                         "messeage_id": mess.id})
 
             # answer - сообщения полученные ботом, id которых больше last_id
             return answer
-        if path == 'send_msg':
+        if path == 'send_msg':  # для добавления сообщения нужен токен бота, текст, id чата
             text, chat_id = request.args.get('text'), request.args.get(
                 'chat_id')
             message = Message(text=text, chat_id=chat_id, sender=bot.id)
             db_sess.add(message)
             db_sess.commit()
             return message.get_information()
-
-
     else:
         return {'error': 'no such bot with this token'}
-    return
+    return 'unknown request'
 
 
 @app.route('/login')
@@ -246,6 +244,22 @@ def check_registration(path):  # эта функция для обработки
                                    "message_sender": last_mess.sender,
                                    "message_date": last_mess.date}})
         return answer
+    if path == 'start_group':
+        users = list(map(int, request.args.get('users').split(
+            ',')))  # users задаются запросом users=1,2,3....?
+        db_sess = db_session.create_session()
+        if len(users) < 2:
+            return {'error': 'add two or more users'}
+        for user_id in users:
+            if db_sess.get(User, user_id):
+                pass
+            else:
+                return {'error': f'no such user with this id: {user_id}'}
+        chat = Chat(type='group',
+                    users=';'.join(list(map(str, users))))
+        db_sess.add(chat)
+        db_sess.commit()
+        return f'added group: {chat.id}'
     return {"response": False}
 
 

@@ -33,6 +33,25 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def set_token(self):
         if self.bot:
-            self.token = str(uuid.uuid3(uuid.NAMESPACE_DNS, f'{self.username}'))
+            self.token = str(
+                uuid.uuid3(uuid.NAMESPACE_DNS, f'{self.username}'))
         else:
             print('This object in user, not bot')
+
+    def get_information(self):
+        if self.bot:
+            return {
+                'id': self.id,
+                'bot': self.bot,
+                'name': self.name,
+                'username': self.username,
+                'chats': self.chats,
+                'token': self.token
+            }
+        return {'id': self.id,
+                'bot': self.bot,
+                'name': self.name,
+                'username': self.username,
+                'email': self.email,
+                'chats': self.chats
+                }

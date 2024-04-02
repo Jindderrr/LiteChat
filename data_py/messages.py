@@ -12,8 +12,15 @@ class Message(SqlAlchemyBase, UserMixin, SerializerMixin):
                            autoincrement=True)
     text = sqlalchemy.Column(sqlalchemy.String)
     date = sqlalchemy.Column(sqlalchemy.DateTime,
-                                     default=datetime.datetime.now)
+                             default=datetime.datetime.now)
     sender = sqlalchemy.Column(sqlalchemy.Integer)
     chat_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("chats.id"))
     chat = orm.relationship('Chat')
+
+    def get_information(self):
+        return {'id': self.id,
+                'text': self.text,
+                'date': self.date,
+                'sender': self.sender,
+                'chat_id': self.chat_id}

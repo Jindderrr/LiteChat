@@ -23,7 +23,7 @@ def bot_http_api(path):
     db_sess = db_session.create_session()
     bot_token = request.args.get("token")
     bot = db_sess.query(User).filter(
-        User.token == bot_token).first()# вместо "None" - ссылка на бота из таблицы
+        User.token == bot_token).first()  # вместо "None" - ссылка на бота из таблицы
     if bot is not None:  # если есть бот с таким токеном
         if path == "get_msgs":
             last_id = int(request.args.get("last_id"))
@@ -41,6 +41,17 @@ def bot_http_api(path):
 
             # answer - сообщения полученные ботом, id которых больше last_id
             return answer
+        if path == 'send_msg':
+            text, chat_id = request.args.get('text'), request.args.get(
+                'chat_id')
+            message = Message(text=text, chat_id=chat_id, sender=bot.id)
+            db_sess.add(message)
+            db_sess.commit()
+            return message.get_information()
+
+
+    else:
+        return {'error': 'no such bot with this token'}
     return
 
 

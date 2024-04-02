@@ -245,6 +245,7 @@ def check_registration(path):  # эта функция для обработки
                                    "message_date": last_mess.date}})
         return answer
     if path == 'start_group':
+        pass_hash = request.args.get('password_hash')
         users = list(map(int, request.args.get('users').split(
             ',')))  # users задаются запросом users=1,2,3....?
         db_sess = db_session.create_session()
@@ -255,6 +256,9 @@ def check_registration(path):  # эта функция для обработки
                 pass
             else:
                 return {'error': f'no such user with this id: {user_id}'}
+        if db_sess.query(User).filter(
+                User.hashed_password == pass_hash) is None:
+            return {'error': 'this hashed password is incorrect'}
         chat = Chat(type='group',
                     users=';'.join(list(map(str, users))))
         db_sess.add(chat)

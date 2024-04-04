@@ -1,4 +1,3 @@
-import datetime
 import uuid
 
 import sqlalchemy
@@ -19,8 +18,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     email = sqlalchemy.Column(sqlalchemy.String, unique=True)
     chats = sqlalchemy.Column(sqlalchemy.String, default='')
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
-    bot = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
-    token = sqlalchemy.Column(sqlalchemy.String)
+    bots = orm.relationship("Bot", back_populates='user')
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
@@ -31,23 +29,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     def add_chat(self, chat_id):
         self.chats += str(chat_id) if self.chats == '' else f';{str(chat_id)}'
 
-    def set_token(self):
-        if self.bot:
-            self.token = str(
-                uuid.uuid3(uuid.NAMESPACE_DNS, f'{self.username}'))
-        else:
-            print('This object in user, not bot')
-
     def get_information(self):
-        if self.bot:
-            return {
-                'id': self.id,
-                'bot': self.bot,
-                'name': self.name,
-                'username': self.username,
-                'chats': self.chats,
-                'token': self.token
-            }
         return {'id': self.id,
                 'bot': self.bot,
                 'name': self.name,

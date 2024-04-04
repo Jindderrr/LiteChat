@@ -13,6 +13,7 @@ from email.header import Header
 import WS
 import json
 from data_py import db_session
+from data_py.bots import Bot
 from data_py.messages import Message
 from data_py.users import User
 from data_py.chats import Chat
@@ -22,58 +23,72 @@ app = Flask(__name__)
 
 USERS_REGISTERING_NOW = {}
 
+
 def BotApi_get_msgs(token="", **args):
     db_sess = db_session.create_session()
-    bot = db_sess.query(User).filter(
-        User.token == token).first()  # вместо "None" - ссылка на бота из таблицы
+    bot = db_sess.query(Bot).filter(
+        Bot.token == token).first()  # вместо "None" - ссылка на бота из таблицы
     if bot is not None:  # если есть бот с таким токеном
         last_id = int(args["last_id"])
-        bot_chats = tuple(map(int, bot.chats.split(';')))
+        print(bot.chats)
+        if len(bot.chats) > 0:
+            bot_chats = tuple(map(int, bot.chats.split(';')))
+        else:
+            bot_chats = []
         answer = []
         for chat_id in bot_chats:
             chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
-            messages = chat.messages[last_id:]
-            for mess in messages:
-                answer.append(
-                    {"sender": mess.sender,
-                     "text": mess.text,
-                     "date": str(mess.date),
-                     "message_id": mess.id,
-                     "chat_id": mess.chat_id})
+            if chat is not None:
+                messages = chat.messages[last_id:]
+                for mess in messages:
+                    answer.append(
+                        {"sender": mess.sender,
+                         "text": mess.text,
+                         "date": str(mess.date),
+                         "message_id": mess.id,
+                         "chat_id": mess.chat_id})
 
         # answer - сообщения полученные ботом, id которых больше last_id
         db_sess.close()
+        print('answer:', answer)
         return answer
+
 
 def BotApi_send_msg(token="", **args):
     db_sess = db_session.create_session()
-    bot = db_sess.query(User).filter(User.token == token).first()  # вместо "None" - ссылка на бота из таблицы
+    bot = db_sess.query(Bot).filter(
+        Bot.token == token).first()
     if bot is not None:  # если есть бот с таким токеном
         text, chat_id = format_msg.format(args['text']), args['chat_id']
         message = Message(text=text, chat_id=chat_id, sender=bot.id)
         db_sess.add(message)
         db_sess.commit()
-        aasitc = [sess for sess in WS.connected_clients if sess.selected_chat_id == chat_id]
+        db_sess.close()
+        aasitc = [sess for sess in WS.connected_clients if
+                  sess.selected_chat_id == chat_id]
         for sess in aasitc:
             async def f():
-                await sess.websocket.send(json.dumps({"type": "new_msg_in_your_chat",
-                                          "message": {"msg_text": text,
-                                                      "msg_sender": bot.username,
-                                                      "msg_time": str(
-                                                          message.date)}}))
+                await sess.websocket.send(
+                    json.dumps({"type": "new_msg_in_your_chat",
+                                "message": {"msg_text": text,
+                                            "msg_sender": bot.username,
+                                            "msg_time": str(
+                                                message.date)}}))
+
             asyncio.run(f())
         return message.get_information()
 
+
 @app.route('/bot/<path:path>')
 def bot_http_api(path):
-
     bot_token = request.args.get("token")
 
     if path == "get_msgs":
-        return BotApi_get_msgs(bot_token, last_id=int(request.args.get("last_id")))
+        return BotApi_get_msgs(bot_token,
+                               last_id=int(request.args.get("last_id")))
     if path == 'send_msg':  # для добавления сообщения нужен токен бота, текст, id чата
-        return BotApi_send_msg(bot_token, text=request.args.get("text"), chat_id=request.args.get("chat_id"))
-
+        return BotApi_send_msg(bot_token, text=request.args.get("text"),
+                               chat_id=request.args.get("chat_id"))
 
     # else:
     #     return {'error': 'no such bot with this token'}
@@ -185,6 +200,7 @@ def check_registration(path):  # эта функция для обработки
                 hashed_pass = user.hashed_password
                 db_sess.add(user)
                 db_sess.commit()
+                db_sess.close()
                 print('user register')
         return {"response": is_success, 'hash': hashed_pass}
 
@@ -214,31 +230,36 @@ def check_registration(path):  # эта функция для обработки
             User.username == request.args.get("my_username")).first()
         scnd_user = db_sess.query(User).filter(
             User.username == request.args.get("another_username")).first()
+        if scnd_user is None:
+            scnd_user = db_sess.query(Bot).filter(
+                Bot.username == request.args.get("another_username")).first()
         if (db_sess.query(Chat).filter(
-                Chat.users == f'{fst_user.id};{scnd_user.id}').first() or
+                Chat.users == f'{fst_user.username};{scnd_user.username}').first() or
                 db_sess.query(Chat).filter(
-                    Chat.users == f'{scnd_user.id};{fst_user.id}').first()):
+                    Chat.users == f'{scnd_user.username};{fst_user.username}').first()):
             return {'error': 'this chat has already been created'}
-            if fst_user.id == scnd_user.id:
-                return {'error': 'can not create chat with yourself'}
+        if fst_user.username == scnd_user.username:
+            return {'error': 'can not create chat with yourself'}
         if scnd_user is None:
             return {'error': 'No such user'}
         check_password_hash(fst_user, pass_hash)
-        chat = Chat(users=f'{fst_user.id};{scnd_user.id}',
+        chat = Chat(users=f'{fst_user.username};{scnd_user.username}',
                     type='single')
         db_sess.add(chat)
         db_sess.commit()
         fst_user.add_chat(chat.id)
         scnd_user.add_chat(chat.id)
         db_sess.commit()
+
         print(f'added chat: {chat.id}')
+        db_sess.close()
         return {'added chat': chat.id}
     if path == 'get_my_chats':  # {"chat_name", "chat_type", "chat_last_message", "number_of_unread_messages"}
         pass_hash = request.args.get("password_hash")
         db_sess = db_session.create_session()
-
+        username = request.args.get('username')
         user = db_sess.query(User).filter(
-            User.username == request.args.get('username')).first()
+            User.username == username).first()
         check_password_hash(user, pass_hash)
         user_chats_id = user.chats.split(';')
         if user_chats_id == ['']:
@@ -246,10 +267,16 @@ def check_registration(path):  # эта функция для обработки
         answer = []
         for chat_id in user_chats_id:
             chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
-            chat_name = list(map(int, chat.users.split(';')))
-            interlocutor = db_sess.query(User).filter(User.id == (chat_name[1 if chat_name[0] == user.id else 0])).first()
-            chat_name = interlocutor.name
-            chat_ico = interlocutor.username
+            if chat.type == 'single':
+                chat_name = chat.users.split(';')
+                chat_name.remove(username)
+                interlocutor = db_sess.query(User).filter(
+                    User.username == chat_name[0]).first()
+                if interlocutor is None:
+                    interlocutor = db_sess.query(Bot).filter(
+                        Bot.username == chat_name[0]).first()
+                chat_name = interlocutor.name
+                chat_ico = interlocutor.username
             if len(chat.messages) == 0:
                 answer.append({'chat_id': chat.id,
                                "chat_name": chat_name,
@@ -292,6 +319,7 @@ def check_registration(path):  # эта функция для обработки
                     users=';'.join(list(map(str, users))))
         db_sess.add(chat)
         db_sess.commit()
+        db_sess.close()
         return f'added group: {chat.id}'
     return {"response": False}
 
@@ -336,6 +364,7 @@ def new_message(msg, web_socket: WS.WebSocket):
             db_sess.add(message)
             db_sess.commit()
             print(f'message added: {message.id}')
+            db_sess.close()
             aasitc = [sess for sess in WS.connected_clients if
                       sess.selected_chat_id == chat_id]
             for sess in aasitc:
@@ -375,25 +404,28 @@ WS.new_msg_func = new_message
 
 def create_bot_creator():
     db_sess = db_session.create_session()
-    bot_creator = db_sess.query(User).filter(
-        User.username == 'bot_creator').first()
-    print(bot_creator)
+    bot_creator = db_sess.query(Bot).filter(
+        Bot.username == 'bot_creator').first()
     if bot_creator:
         pass
     else:
-        bot_creator = User(bot=True,
-                           username='bot_creator',
-                           name='Bot Creator',
-                           )
+        bot_creator = Bot(username='bot_creator',
+                          name='Bot Creator'
+                          )
         bot_creator.set_token()
         db_sess.add(bot_creator)
         db_sess.commit()
 
+        db_sess.close()
+
 
 if __name__ == '__main__':
     db_session.global_init('db/messenger.db')
-    bot_BotCreator.start(BotApi_get_msgs, BotApi_send_msg, token="")
     create_bot_creator()
+    creator_token = db_session.create_session().query(Bot).filter(
+        Bot.username == 'bot_creator').first().token
+
+    bot_BotCreator.start(BotApi_get_msgs, BotApi_send_msg, token=creator_token)
     print("окно регистрации тут - http://127.0.0.1:8080/registration")
     print("окно входа тут - http://127.0.0.1:8080/login")
     app.run(port=8080, host='127.0.0.1')

@@ -1,7 +1,11 @@
+import os
 import random
 from email.mime.multipart import MIMEMultipart
 
+import asyncio
 from flask import Flask, request, send_from_directory, jsonify
+
+import format_msg
 from config import EMAIL_LOGIN, EMAIL_PASSWORD
 import smtplib
 from email.mime.text import MIMEText
@@ -12,44 +16,67 @@ from data_py import db_session
 from data_py.messages import Message
 from data_py.users import User
 from data_py.chats import Chat
+import bot_BotCreator
 
 app = Flask(__name__)
 
 USERS_REGISTERING_NOW = {}
 
+def BotApi_get_msgs(token="", **args):
+    db_sess = db_session.create_session()
+    bot = db_sess.query(User).filter(
+        User.token == token).first()  # вместо "None" - ссылка на бота из таблицы
+    if bot is not None:  # если есть бот с таким токеном
+        last_id = int(args["last_id"])
+        bot_chats = tuple(map(int, bot.chats.split(';')))
+        answer = []
+        for chat_id in bot_chats:
+            chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
+            messages = chat.messages[last_id:]
+            for mess in messages:
+                answer.append(
+                    {"sender": mess.sender,
+                     "text": mess.text,
+                     "date": str(mess.date),
+                     "message_id": mess.id,
+                     "chat_id": mess.chat_id})
+
+        # answer - сообщения полученные ботом, id которых больше last_id
+        db_sess.close()
+        return answer
+
+def BotApi_send_msg(token="", **args):
+    db_sess = db_session.create_session()
+    bot = db_sess.query(User).filter(User.token == token).first()  # вместо "None" - ссылка на бота из таблицы
+    if bot is not None:  # если есть бот с таким токеном
+        text, chat_id = format_msg.format(args['text']), args['chat_id']
+        message = Message(text=text, chat_id=chat_id, sender=bot.id)
+        db_sess.add(message)
+        db_sess.commit()
+        aasitc = [sess for sess in WS.connected_clients if sess.selected_chat_id == chat_id]
+        for sess in aasitc:
+            async def f():
+                await sess.websocket.send(json.dumps({"type": "new_msg_in_your_chat",
+                                          "message": {"msg_text": text,
+                                                      "msg_sender": bot.username,
+                                                      "msg_time": str(
+                                                          message.date)}}))
+            asyncio.run(f())
+        return message.get_information()
 
 @app.route('/bot/<path:path>')
 def bot_http_api(path):
-    db_sess = db_session.create_session()
-    bot_token = request.args.get("token")
-    bot = db_sess.query(User).filter(
-        User.token == bot_token).first()  # вместо "None" - ссылка на бота из таблицы
-    if bot is not None:  # если есть бот с таким токеном
-        if path == "get_msgs":
-            last_id = int(request.args.get("last_id"))
-            bot_chats = tuple(map(int, bot.chats.split(';')))
-            answer = []
-            for chat_id in bot_chats:
-                chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
-                messages = chat.messages[last_id:]
-                for mess in messages:
-                    answer.append(
-                        {"sender": mess.sender,
-                         "text": mess.text,
-                         "date": str(mess.date),
-                         "messeage_id": mess.id})
 
-            # answer - сообщения полученные ботом, id которых больше last_id
-            return answer
-        if path == 'send_msg':  # для добавления сообщения нужен токен бота, текст, id чата
-            text, chat_id = request.args.get('text'), request.args.get(
-                'chat_id')
-            message = Message(text=text, chat_id=chat_id, sender=bot.id)
-            db_sess.add(message)
-            db_sess.commit()
-            return message.get_information()
-    else:
-        return {'error': 'no such bot with this token'}
+    bot_token = request.args.get("token")
+
+    if path == "get_msgs":
+        return BotApi_get_msgs(bot_token, last_id=int(request.args.get("last_id")))
+    if path == 'send_msg':  # для добавления сообщения нужен токен бота, текст, id чата
+        return BotApi_send_msg(bot_token, text=request.args.get("text"), chat_id=request.args.get("chat_id"))
+
+
+    # else:
+    #     return {'error': 'no such bot with this token'}
     return 'unknown request'
 
 
@@ -220,13 +247,14 @@ def check_registration(path):  # эта функция для обработки
         for chat_id in user_chats_id:
             chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
             chat_name = list(map(int, chat.users.split(';')))
-            chat_name = db_sess.query(User).filter(User.id == (
-                chat_name[
-                    1 if chat_name[0] == user.id else 0])).first().name
+            interlocutor = db_sess.query(User).filter(User.id == (chat_name[1 if chat_name[0] == user.id else 0])).first()
+            chat_name = interlocutor.name
+            chat_ico = interlocutor.username
             if len(chat.messages) == 0:
                 answer.append({'chat_id': chat.id,
                                "chat_name": chat_name,
                                "chat_type": chat.type,
+                               "chat_ico": chat_ico,
                                "number_of_unread_messages": chat.unread_messages,
                                "chat_last_message": {
                                    "message_text": '',
@@ -237,6 +265,7 @@ def check_registration(path):  # эта функция для обработки
                     sorted(chat.messages, key=lambda x: x.id, reverse=True)[0]
                 answer.append({'chat_id': chat.id,
                                "chat_name": chat_name,
+                               "chat_ico": chat_ico,
                                "chat_type": chat.type,
                                "number_of_unread_messages": chat.unread_messages,
                                "chat_last_message": {
@@ -271,6 +300,10 @@ def check_registration(path):  # эта функция для обработки
 def get_file_in_front(filename):
     if True:
         print(request.remote_addr + " запросил " + filename)
+        if os.path.isfile(os.path.join('front', filename)):
+            return send_from_directory('front', filename)
+        if filename[:6] == "icons/":
+            return send_from_directory('front', 'data/no_ico.jpg')
         return send_from_directory('front', filename)
     else:
         print(request.remote_addr + " запросил " + filename + " - ОТКАЗАНО!")
@@ -359,6 +392,7 @@ def create_bot_creator():
 
 if __name__ == '__main__':
     db_session.global_init('db/messenger.db')
+    bot_BotCreator.start(BotApi_get_msgs, BotApi_send_msg, token="")
     create_bot_creator()
     print("окно регистрации тут - http://127.0.0.1:8080/registration")
     print("окно входа тут - http://127.0.0.1:8080/login")

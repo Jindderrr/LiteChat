@@ -72,10 +72,10 @@ function send() {
                 request(`/request/registration/check_code?email=${email}&name=${name}&password=${password}&code=${code}`, function(response2) {
                     console.log(response2["response"])
                     if (response2["response"]) {
-                        setCookie("email", email, 30)
-                        setCookie("username", username, 30)
-                        setCookie("name", name, 30)
-                        setCookie("password_hash", response["hash"], 30)
+                        setCookie("email", email)
+                        setCookie("username", username)
+                        setCookie("name", name)
+                        setCookie("password_hash", response["hash"])
                         setRandomTheme()
                         window.location.assign("./")
                     }

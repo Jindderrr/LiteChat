@@ -103,14 +103,15 @@ function UpdateChats() {
         let html = `
             <div id="onmouse_div_${i}" class="chat_button" onmouseover="mouse_over(${i})" onmouseout="mouse_out(${i})" onclick="select_chat(${i})"> 
                 <div class="chat_button_text_container">
-                    <img src=/front/main/ico_${Math.floor(Math.random() * 2)}.png class="chat_ico"> 
-                    <div id="chat_name_text_box_${i}" class="chat_button_text_box"> <nobr><b>${chats[i]["chat_name"]}</b><br>${chats[i]["chat_last_message"]["message_text"]}</nobr></div>
+                    <img src=/front/icons/${chats[i]["chat_ico"]}.jpg class="chat_ico"> 
+                    <div id="chat_name_text_box_${i}" class="chat_button_text_box"> <nobr><b>${chats[i]["chat_name"]}</b><br>${chats[i]["chat_last_message"]["message_text"].replace(/<br>/g, " ")}</nobr></div>
                     <div id="chat_text_box__${i}" class="chat_button_time_box"> <i> ${chats[i]["chat_last_message"]["message_date"]} </i> </div>
                 </div>
             </div>
         `
         document.getElementById("chats_container").innerHTML += html
     }
+    if (SelectedChat == -1 && chats.length != 0) { select_chat(0) }
 }
 
 function resize_chat_text_box() {
@@ -131,6 +132,7 @@ function select_chat(i) {
     elem.style.backgroundColor = SELECTED_CHAT_COLOR
     document.getElementById("top_text").innerHTML = "<b>" + chats[SelectedChat]["chat_name"] + "</b>"
     WS.send(JSON.stringify({"type": "change_chat", "args": {"selected_chat_id": chats[SelectedChat]["chat_id"]}}))
+    document.getElementById("selected_chat_ico").src = `/front/icons/${chats[i]["chat_ico"]}.jpg`
     //elem.style.borderRadius = "12px 0px 0px 12px"
 }
 
@@ -141,7 +143,8 @@ function to_vertical_mode() {
     document.getElementById("chats_container").style.visibility = "hidden"
     document.getElementById("chat_container").style.width = "100%"
     document.getElementById("chats_container_top").style.width = "100%"
-    document.getElementById("chat_text_input_container").style.width = "92%"
+    document.getElementById("chat_text_input_container").style.width = "calc(100% - 50px)"
+    // document.getElementById("emojis_menu").style.right = "4%"
 }
 
 function to_horizontal_mode() {
@@ -149,7 +152,8 @@ function to_horizontal_mode() {
     document.getElementById("chats_container").style.visibility = "visible"
     document.getElementById("chat_container").style.width = "calc(100% - 35% - 50px)"
     document.getElementById("chats_container_top").style.width = "calc(100% - 35% - 50px)"
-    document.getElementById("chat_text_input_container").style.width = "calc(92% - 35% - 50px)"
+    document.getElementById("chat_text_input_container").style.width = "calc(100% - 35% - 50px - 50px)"
+    // document.getElementById("emojis_menu").style.right = "4%"
 }
 
 window.addEventListener('resize', function() {
@@ -165,6 +169,23 @@ else {to_horizontal_mode()}
 function newChat() {
     another_username = prompt("username?")
     request(`/request/start_chat?my_username=${cookies["username"]}&another_username=${another_username}`)
+}
+
+let in_settings = false
+function settings() {
+    in_settings = !in_settings
+    let settings_container = document.getElementById("settings_container")
+    if (in_settings) {
+        settings_container.classList.remove("settings_container_hidden")
+        settings_container.classList.add("settings_container_visible")
+        document.getElementById("settings_row_name").innerHTML = "name: " + cookies["name"]
+        document.getElementById("settings_row_username").innerHTML = "username: " + cookies["username"]
+        document.getElementById("settings_row_email").innerHTML = "email: " + cookies["email"]
+        document.getElementById("settings_head_ico").src = `/front/icons/${cookies["uername"]}.jpg`
+    } else {
+        settings_container.classList.remove("settings_container_visible")
+        settings_container.classList.add("settings_container_hidden")
+    }
 }
 
 
@@ -205,6 +226,28 @@ function add_msg(msgText, sender_username) {
         </div>
     `
     document.getElementById("message_container").innerHTML += html
-    //document.getElementById("message_" + LAST_MSG_INDEX).style.borderRadius = style
     LAST_MSG_SENDER = sender_username
 }
+
+const smiles_message_button = document.querySelector('.smiles_message_button');
+const emojis_menu = document.querySelector('.emojis_menu');
+let timeoutId;
+
+smiles_message_button.addEventListener('mouseover', () => {
+    emojis_menu.style.visibility = "visible"
+    clearTimeout(timeoutId)
+})
+emojis_menu.addEventListener('mouseover', () => {
+    emojis_menu.style.visibility = "visible"
+    clearTimeout(timeoutId)
+})
+emojis_menu.addEventListener('mouseout', () => {
+    timeoutId = setTimeout(() => {
+        emojis_menu.style.visibility = "hidden"
+    }, 200)
+})
+smiles_message_button.addEventListener('mouseout', () => {
+    timeoutId = setTimeout(() => {
+        emojis_menu.style.visibility = "hidden"
+    }, 300)
+})

@@ -1,3 +1,4 @@
+<script src=../front/base.js></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,8 +11,22 @@
 </head>
     <body>
         <div id="chat_container" class="chat_container">
-            <img id="chat_fon_img" src=../front/data/chat_fon.jpg class="chat_fon_img">
+            <img id="chat_fon_img" src=../front/data/chat_fon0.jpg class="chat_fon_img">
             <div id="message_container" class="messages_container"> </div>
+            <div id="emojis_menu" class="emojis_menu">
+                <div class="emoji_layer">
+                    <div class="emoji_button">😉</div>
+                    <div class="emoji_button">😉</div>
+                    <div class="emoji_button">😉</div>
+                    <div class="emoji_button">😉</div>
+                    <div class="emoji_button">😉</div>
+                    <div class="emoji_button">😉</div>
+                    <div class="emoji_button">😉</div>
+                    <div class="emoji_button">😉</div>
+                    <div class="emoji_button">😉</div>
+                    <div class="emoji_button">😉</div>
+                </div>
+            </div>
         </div>
         <div id="chat_text_input_container" class="chat_text_input_container"> 
             <textarea id="message_textarea" class="input_box" oninput="autoResize()" rows="1" placeholder=""></textarea>
@@ -22,19 +37,31 @@
         </div>
         <div id="chats_container_top" class="chats_container_top">
             <div class="top_info_container">
-                <img src=/front/main/ico_1.png class="chat_ico">
+                <img id="selected_chat_ico" src=/front/main/ico_1.png class="chat_ico">
                 <div id="top_text" class="top_text"> </div>
             </div>
         </div>
+        
         <div id="left_panel_container" class="left_panel_container">
             <button class="left_panel_buttons add_chat_button" onclick="newChat()">+</button>
-            <button class="left_panel_buttons">i</button>
+            <button class="left_panel_buttons" onclick="settings()">s</button>
             <button class="left_panel_buttons" onclick="changeTheme()">t</button>
             <button class="left_panel_buttons" onclick="changeFon()">f</button>
         </div>
-        <div id="chats_container" class="chats_container"> </div>
+        <div class="middle_container">
+            <div id="chats_container" class="chats_container"> </div>
+            <div id="settings_container" class="settings_container_hidden">
+                <img id="settings_head_ico" class="settings_head">
+                <div class="settings_main">
+                    <div id="settings_row_username" class="settings_row"></div>
+                    <div id="settings_row_name" class="settings_row"></div>
+                    <div id="settings_row_email" class="settings_row"></div>
+                    <div id="clk" class="settings_row settings_change_password_button"> change password </div>
+                </div>
+            </div>
+        </div>
         
     </body>
 </html>
-<script src=../front/base.js></script>
+
 <script src=../front/main/index.js></script>

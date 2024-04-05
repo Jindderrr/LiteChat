@@ -102,6 +102,7 @@ I hope I helped you figure out our api, if you still have questions, then you ca
                             bot_parts.pop(sender.username)
                             send_msgs_func(token, text=send_text,
                                            chat_id=msg["chat_id"])
+                            creating_bot_username = False
                     else:
                         send_text = 'Bot username must be more than 3 symbols, less than 15 symbols and must and must end with "bot"'
                         send_msgs_func(token, text=send_text,

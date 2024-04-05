@@ -22,10 +22,11 @@ import bot_BotCreator
 app = Flask(__name__)
 
 USERS_REGISTERING_NOW = {}
+db_session.global_init('db/messenger.db')
+db_sess = db_session.create_session()
 
 
 def BotApi_get_msgs(token="", **args):
-    db_sess = db_session.create_session()
     bot = db_sess.query(Bot).filter(
         Bot.token == token).first()  # вместо "None" - ссылка на бота из таблицы
     if bot is not None:  # если есть бот с таким токеном
@@ -49,13 +50,12 @@ def BotApi_get_msgs(token="", **args):
                          "chat_id": mess.chat_id})
 
         # answer - сообщения полученные ботом, id которых больше last_id
-        db_sess.close()
+        # db_sess.close()
         print('answer:', answer)
         return answer
 
 
 def BotApi_send_msg(token="", **args):
-    db_sess = db_session.create_session()
     bot = db_sess.query(Bot).filter(
         Bot.token == token).first()
     if bot is not None:  # если есть бот с таким токеном
@@ -63,7 +63,7 @@ def BotApi_send_msg(token="", **args):
         message = Message(text=text, chat_id=chat_id, sender=bot.id)
         db_sess.add(message)
         db_sess.commit()
-        db_sess.close()
+        # db_sess.close()
         aasitc = [sess for sess in WS.connected_clients if
                   sess.selected_chat_id == chat_id]
         for sess in aasitc:
@@ -119,7 +119,6 @@ def check_registration(path):  # эта функция для обработки
     print(f'arguments: {request.args}')
     if path == "registration/check_email":  # ->->->
         a_email = request.args.get("email")
-        db_sess = db_session.create_session()
         email_is_free = not db_sess.query(User).filter(
             User.email == a_email).first()  # email свободен?
         print("email is free: " + email_is_free)
@@ -127,7 +126,6 @@ def check_registration(path):  # эта функция для обработки
 
     if path == "registration/check_username":  # ->->->
         a_username = request.args.get("username")
-        db_sess = db_session.create_session()
         username_is_free = not db_sess.query(User).filter(
             User.username == a_username).first()  # username свободен?
         print("username is free: " + username_is_free)
@@ -137,7 +135,6 @@ def check_registration(path):  # эта функция для обработки
         a_email = request.args.get("email")
         a_username = request.args.get("username")
         # тут надо ещё раз проверить, что всё ок (нет пользователей с такой почтой и username),
-        db_sess = db_session.create_session()
         is_ok = not db_sess.query(User).filter(
             User.username == a_username).first() and not db_sess.query(
             User).filter(
@@ -192,7 +189,6 @@ def check_registration(path):  # эта функция для обработки
                 a_name = request.args.get("name")
                 a_password = request.args.get("password")
                 # если код верный, то внести пользовотеля в БД
-                db_sess = db_session.create_session()
                 user = User(name=a_name,
                             username=a_username,
                             email=a_email)
@@ -200,14 +196,13 @@ def check_registration(path):  # эта функция для обработки
                 hashed_pass = user.hashed_password
                 db_sess.add(user)
                 db_sess.commit()
-                db_sess.close()
+                # db_sess.close()
                 print('user register')
         return {"response": is_success, 'hash': hashed_pass}
 
     if path == "login":  # от пользователя получены данные для входа
         a_email_username = request.args.get("email-username")
         a_password = request.args.get("password")
-        db_sess = db_session.create_session()
         user = db_sess.query(User).filter(
             a_email_username == User.email).first()
         if user is None:
@@ -225,7 +220,6 @@ def check_registration(path):  # эта функция для обработки
                 'name': name, 'email': email}
     if path == "start_chat":
         pass_hash = request.args.get("password_hash")
-        db_sess = db_session.create_session()
         fst_user = db_sess.query(User).filter(
             User.username == request.args.get("my_username")).first()
         scnd_user = db_sess.query(User).filter(
@@ -252,11 +246,10 @@ def check_registration(path):  # эта функция для обработки
         db_sess.commit()
 
         print(f'added chat: {chat.id}')
-        db_sess.close()
+        # db_sess.close()
         return {'added chat': chat.id}
     if path == 'get_my_chats':  # {"chat_name", "chat_type", "chat_last_message", "number_of_unread_messages"}
         pass_hash = request.args.get("password_hash")
-        db_sess = db_session.create_session()
         username = request.args.get('username')
         user = db_sess.query(User).filter(
             User.username == username).first()
@@ -304,7 +297,6 @@ def check_registration(path):  # эта функция для обработки
         pass_hash = request.args.get('password_hash')
         users = list(map(int, request.args.get('users').split(
             ',')))  # users задаются запросом users=1,2,3....?
-        db_sess = db_session.create_session()
         if len(users) < 2:
             return {'error': 'add two or more users'}
         for user_id in users:
@@ -319,7 +311,7 @@ def check_registration(path):  # эта функция для обработки
                     users=';'.join(list(map(str, users))))
         db_sess.add(chat)
         db_sess.commit()
-        db_sess.close()
+        # db_sess.close()
         return f'added group: {chat.id}'
     return {"response": False}
 
@@ -348,7 +340,6 @@ def new_message(msg, web_socket: WS.WebSocket):
     if web_socket.honest:
         args = msg["args"]
         msg_type = msg["type"]
-        db_sess = db_session.create_session()
 
         if msg_type == "send_msg":
             username = web_socket.init_info["username"]
@@ -364,7 +355,7 @@ def new_message(msg, web_socket: WS.WebSocket):
             db_sess.add(message)
             db_sess.commit()
             print(f'message added: {message.id}')
-            db_sess.close()
+            # db_sess.close()
             aasitc = [sess for sess in WS.connected_clients if
                       sess.selected_chat_id == chat_id]
             for sess in aasitc:
@@ -403,7 +394,6 @@ WS.new_msg_func = new_message
 
 
 def create_bot_creator():
-    db_sess = db_session.create_session()
     bot_creator = db_sess.query(Bot).filter(
         Bot.username == 'bot_creator').first()
     if bot_creator:
@@ -416,11 +406,10 @@ def create_bot_creator():
         db_sess.add(bot_creator)
         db_sess.commit()
 
-        db_sess.close()
+        # db_sess.close()
 
 
 if __name__ == '__main__':
-    db_session.global_init('db/messenger.db')
     create_bot_creator()
     creator_token = db_session.create_session().query(Bot).filter(
         Bot.username == 'bot_creator').first().token

@@ -31,7 +31,6 @@ def BotApi_get_msgs(token="", **args):
         Bot.token == token).first()  # вместо "None" - ссылка на бота из таблицы
     if bot is not None:  # если есть бот с таким токеном
         last_id = int(args["last_id"])
-        print(bot.chats)
         if len(bot.chats) > 0:
             bot_chats = tuple(map(int, bot.chats.split(';')))
         else:
@@ -40,7 +39,7 @@ def BotApi_get_msgs(token="", **args):
         for chat_id in bot_chats:
             chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
             if chat is not None:
-                messages = chat.messages[last_id:]
+                messages = [msg for msg in chat.messages if msg.id > last_id    ]
                 for mess in messages:
                     answer.append(
                         {"sender": mess.sender,
@@ -53,6 +52,7 @@ def BotApi_get_msgs(token="", **args):
         # db_sess.close()
         print('answer:', answer)
         return answer
+    return {"responce": "Invalid bot"}
 
 
 def BotApi_send_msg(token="", **args):
@@ -77,6 +77,7 @@ def BotApi_send_msg(token="", **args):
 
             asyncio.run(f())
         return message.get_information()
+    return {"responce": "Invalid bot"}
 
 
 @app.route('/bot/<path:path>')
@@ -84,8 +85,8 @@ def bot_http_api(path):
     bot_token = request.args.get("token")
 
     if path == "get_msgs":
-        return BotApi_get_msgs(bot_token,
-                               last_id=int(request.args.get("last_id")))
+        return jsonify(BotApi_get_msgs(bot_token,
+                               last_id=int(request.args.get("last_id"))))
     if path == 'send_msg':  # для добавления сообщения нужен токен бота, текст, id чата
         return BotApi_send_msg(bot_token, text=request.args.get("text"),
                                chat_id=request.args.get("chat_id"))
@@ -348,7 +349,7 @@ def new_message(msg, web_socket: WS.WebSocket):
                 User.username == username).first()
             check_user_chat(user, chat_id)
 
-            msg_text = args["msg_text"]
+            msg_text = format_msg.format(args["msg_text"])
             message = Message(text=msg_text,
                               sender=username,
                               chat_id=chat_id)
@@ -405,8 +406,6 @@ def create_bot_creator():
         bot_creator.set_token()
         db_sess.add(bot_creator)
         db_sess.commit()
-
-        # db_sess.close()
 
 
 if __name__ == '__main__':

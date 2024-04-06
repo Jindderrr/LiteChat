@@ -1,6 +1,4 @@
-let LAST_MSG_ID = 0
 let IS_VERTICAL_MODE = false
-let LAST_MSG_INEX = 0
 if (getCookie("theme") == undefined) { setCookie("theme", 0) }
 if (getCookie("nfon") == undefined) { setCookie("nfon", 0) }
 
@@ -11,7 +9,6 @@ WS.onopen = function() {
 }
 
 WS.onmessage = function(event) {
-    
     let data = JSON.parse(event.data)
     console.log(data)
     if (data["type"] == "change_chat_answer") {
@@ -181,7 +178,7 @@ function settings() {
         document.getElementById("settings_row_name").innerHTML = "name: " + cookies["name"]
         document.getElementById("settings_row_username").innerHTML = "username: " + cookies["username"]
         document.getElementById("settings_row_email").innerHTML = "email: " + cookies["email"]
-        document.getElementById("settings_head_ico").src = `/front/icons/${cookies["uername"]}.jpg`
+        document.getElementById("settings_head_ico").src = `/front/icons/${cookies["username"]}.jpg`
     } else {
         settings_container.classList.remove("settings_container_visible")
         settings_container.classList.add("settings_container_hidden")
@@ -193,8 +190,11 @@ function settings() {
 function send_msg() {
     let msgText = document.getElementById("message_textarea").value
     document.getElementById("message_textarea").value = ""
-    WS.send(JSON.stringify({"type": "send_msg", "args": {"msg_text": msgText, "chat_id": chats[SelectedChat]["chat_id"]}}))
-    // request(`/request/send_msg?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&msg_text=${msgText}&chat_id=${chats[SelectedChat]["chat_id"]}`)
+    send_msg_text(msgText)
+}
+
+function send_msg_text(text) {
+    WS.send(JSON.stringify({"type": "send_msg", "args": {"msg_text": text, "chat_id": chats[SelectedChat]["chat_id"]}}))
     autoResize()
     autoScroll()
 }
@@ -205,18 +205,9 @@ function autoScroll() {
 }
 
 
-let LAST_MSG_SENDER
 function add_msg(msgText, sender_username) {
     let whose_msg = Number(cookies["username"] != sender_username)
-    let style = ''
-    // if (LAST_MSG_SENDER == sender_username) {
-    //     //alert("!!!")
-    //     if (whose_msg == cookies["username"]) {
-    //         style = '19px 2px 2px 19px'
-    //     } else {
-    //         style = '2px 19px 19px 2px'
-    //     }
-    // }
+    msgText = format_msg_text(msgText)
     LAST_MSG_INDEX += 1
     let html = `
         <div class="message_box" style="justify-content: ${["end", "start", "center"][whose_msg]};">
@@ -226,12 +217,47 @@ function add_msg(msgText, sender_username) {
         </div>
     `
     document.getElementById("message_container").innerHTML += html
-    LAST_MSG_SENDER = sender_username
 }
 
-const smiles_message_button = document.querySelector('.smiles_message_button');
-const emojis_menu = document.querySelector('.emojis_menu');
-let timeoutId;
+const DOMAINS = [".ru", ".рф", ".com", ".net", ".org", ".info", ".biz", ".online", ".shop", ".site", ".site", ".xyz", ".uk", ".de", ".cn", ".nl", ".br", ".au", ".fr", ".eu"]
+function format_msg_text(text) {
+    text = text.split(" ")
+    for (let n = 0; n < text.length; n++) {
+        i = text[n]
+        i.toLowerCase()
+        for (let d of DOMAINS) {
+            if (i.includes(d)) {
+                console.log("-"*100)
+                console.log(i)
+                console.log(text)
+                console.log(d)
+                if (i.indexOf(d) != 0) {
+                    text[n] = '<a target="_blank" href=' + i + '>' + i + "</a>"
+                    break
+                }
+            }
+            let si = i.split("\n")
+            for (let n2 = 0; n2 < si.length; n2++) {
+                i2 = si[n2]
+                if (i2[0] == "/" && i2.split("/").length == 2) {
+                    si[n2] = '<span style="color: var(--bot-commands-color); cursor:pointer" onclick="send_msg_text('+"'"+i2+"'"+')">'+i2+'</span>'
+                }
+            }
+            text[n] = si.join("\n")
+        }
+    }
+    text = text.join(" ")
+    let ch = {"\n": "<br>", "T^{": "<i>", "}^T": "</i>", "T-{": "<b>", "}-T": "</b>", "T_{": "<u>", "}_T": "</u>"}
+    for (let i in ch){
+        text = text.split(i)
+        text = text.join(ch[i])
+    }
+    return text
+}
+
+const smiles_message_button = document.querySelector('.smiles_message_button')
+const emojis_menu = document.querySelector('.emojis_menu')
+let timeoutId
 
 smiles_message_button.addEventListener('mouseover', () => {
     emojis_menu.style.visibility = "visible"
@@ -250,4 +276,29 @@ smiles_message_button.addEventListener('mouseout', () => {
     timeoutId = setTimeout(() => {
         emojis_menu.style.visibility = "hidden"
     }, 300)
+})
+
+
+
+function openFileSelector() {
+    document.getElementById('fileInput').click()
+}
+
+document.getElementById('fileInput').addEventListener('change', function() {
+    var file = this.files[0]
+    if (file) {
+        let formData = new FormData()
+        formData.append('file', file)
+        let xhr = new XMLHttpRequest()
+        xhr.open('POST', `http://127.0.0.1:8080/edit_profile_icon?username=${cookies["username"]}`, true)
+        xhr.onload = function() {
+            if (xhr.status != 200) {
+                alert('Ошибка при загрузке файла на сервер')
+            }
+        }
+        xhr.send(formData)
+        setTimeout(() => {
+            document.getElementById("settings_head_ico").src = `/front/icons/${cookies["username"]}.jpg?${new Date().getTime()}`
+        }, 1000)
+    }
 })

@@ -12,6 +12,7 @@
     --emoji-button-color: rgb(250, 249, 232);
     --my-msg-color: rgb(232, 199, 182);
     --no-my-msg-color: rgb(229, 194, 177);
+    --bot-commands-color: rgb(160, 70, 70);
 }
 .dark-theme {
     --chat-color: rgb(4, 5, 10);
@@ -25,8 +26,9 @@
     --left-panel-buttons-text-color: rgb(206, 206, 206);
     --send-button-color: rgb(47, 78, 59);
     --emoji-button-color: rgb(90, 86, 45);
-    --my-msg-color: rgb(138, 138, 138);
+    --my-msg-color: rgb(123, 123, 123);
     --no-my-msg-color: rgb(64, 64, 64);
+    --bot-commands-color: rgb(255, 100, 100);
 }
 .light-theme {
     --chat-color: rgb(226, 226, 227);
@@ -42,6 +44,7 @@
     --emoji-button-color: rgb(233, 228, 182);
     --my-msg-color: white;
     --no-my-msg-color: rgb(243, 243, 243);
+    --bot-commands-color: rgb(160, 0, 0);
 }
 .purple-theme {
     --chat-color: rgb(192, 116, 188);
@@ -57,6 +60,7 @@
     --emoji-button-color: rgb(205, 150, 190);
     --my-msg-color: rgb(240, 0, 230);
     --no-my-msg-color: rgb(220, 0, 210);
+    --bot-commands-color: rgb(255, 255, 0);
 }
 .green-theme {
     --chat-color: rgb(103, 194, 102);
@@ -72,6 +76,7 @@
     --emoji-button-color: rgb(157, 205, 150);
     --my-msg-color: rgb(0, 240, 76);
     --no-my-msg-color: rgb(11, 220, 0);
+    --bot-commands-color: rgb(0, 0, 255);
 }
 .blue-theme {
     --chat-color: rgb(102, 142, 194);
@@ -87,4 +92,5 @@
     --emoji-button-color: rgb(150, 178, 205);
     --my-msg-color: rgb(0, 136, 240);
     --no-my-msg-color: rgb(0, 161, 220);
+    --bot-commands-color: rgb(255, 255, 255);
 }

@@ -94,12 +94,12 @@ button:active {
     padding-right: 8px;
     border-radius: 10px;
     cursor: pointer;
-    background-color: rgb(75, 75, 75);
+    background-color: var(--settings-row-color);
     font-size: 20px;
     margin: 5px;
 }
 .settings_row:active {
-    box-shadow: 0 0 10px rgb(75, 75, 75);
+    box-shadow: 0 0 10px var(--settings-row-color);
 }
 .chat_fon_img {
     position: fixed;

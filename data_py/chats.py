@@ -15,3 +15,8 @@ class Chat(SqlAlchemyBase, UserMixin, SerializerMixin):
     unread_messages = sqlalchemy.Column(sqlalchemy.Integer,
                                         default=0)
     messages = orm.relationship("Message", back_populates='chat')
+
+    def get_information(self):
+        return {'id': self.id,
+                'users': self.users.split(';'),
+                'unread_messages': self.unread_messages}

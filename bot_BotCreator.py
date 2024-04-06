@@ -50,7 +50,7 @@ You can use /create_bot to create a new bot. 😉😉😉😉😉"""
                     send_text = """And so, using our api is very easy😉:
 
 
-In order to receive the messages sent to your bot, send a request like: "http://127.0.0.1:8080/bot/get_msgs?token =[your bot's token]&last_id=[message id starting from which you want to receive messages]";
+In order to receive the messages sent to your bot, send a request like: "http://127.0.0.1:8080/bot/get_msgs?token=[your bot's token]&last_id=[message id starting from which you want to receive messages]";
 
 You will get the result in json format like:
 array[

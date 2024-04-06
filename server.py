@@ -4,6 +4,7 @@ from email.mime.multipart import MIMEMultipart
 
 import asyncio
 from flask import Flask, request, send_from_directory, jsonify
+from flask_restful import Api
 
 import format_msg
 from config import EMAIL_LOGIN, EMAIL_PASSWORD
@@ -20,7 +21,7 @@ from data_py.chats import Chat
 import bot_BotCreator
 
 app = Flask(__name__)
-
+api = Api(app)
 USERS_REGISTERING_NOW = {}
 db_session.global_init('db/messenger.db')
 db_sess = db_session.create_session()
@@ -28,71 +29,79 @@ db_sess = db_session.create_session()
 
 def BotApi_get_msgs(token="", **args):
     bot = db_sess.query(Bot).filter(
-        Bot.token == token).first()  # вместо "None" - ссылка на бота из таблицы
-    if bot is not None:  # если есть бот с таким токеном
-        last_id = int(args["last_id"])
-        if len(bot.chats) > 0:
-            bot_chats = tuple(map(int, bot.chats.split(';')))
-        else:
-            bot_chats = []
-        answer = []
-        for chat_id in bot_chats:
-            chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
-            if chat is not None:
-                messages = [msg for msg in chat.messages if msg.id > last_id    ]
-                for mess in messages:
+        Bot.token == token).first()
+    check_bot(token)  # если есть бот с таким токеном
+    last_id = int(args["last_id"])
+    if len(bot.chats) > 0:
+        bot_chats = tuple(map(int, bot.chats.split(';')))
+    else:
+        bot_chats = []
+    answer = []
+    for chat_id in bot_chats:
+        chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
+        if chat is not None:
+            messages = [msg for msg in chat.messages if msg.id > last_id]
+            for mess in messages:
+                if mess.sender != 'bot_creator':
                     answer.append(
                         {"sender": mess.sender,
                          "text": mess.text,
                          "date": str(mess.date),
                          "message_id": mess.id,
                          "chat_id": mess.chat_id})
-
-        # answer - сообщения полученные ботом, id которых больше last_id
-        # db_sess.close()
-        print('answer:', answer)
-        return answer
-    return {"responce": "Invalid bot"}
+    # answer - сообщения полученные ботом, id которых больше last_id
+    # db_sess.close()
+    return answer
 
 
 def BotApi_send_msg(token="", **args):
-    bot = db_sess.query(Bot).filter(
-        Bot.token == token).first()
-    if bot is not None:  # если есть бот с таким токеном
-        text, chat_id = format_msg.format(args['text']), args['chat_id']
-        message = Message(text=text, chat_id=chat_id, sender=bot.id)
-        db_sess.add(message)
-        db_sess.commit()
-        # db_sess.close()
-        aasitc = [sess for sess in WS.connected_clients if
-                  sess.selected_chat_id == chat_id]
-        for sess in aasitc:
-            async def f():
-                await sess.websocket.send(
-                    json.dumps({"type": "new_msg_in_your_chat",
-                                "message": {"msg_text": text,
-                                            "msg_sender": bot.username,
-                                            "msg_time": str(
-                                                message.date)}}))
+    check_bot(token)  # если есть бот с таким токеном
+    bot = db_sess.query(Bot).filter(Bot.token == token).first()
+    text, chat_id = format_msg.format(args['text']), args['chat_id']
+    message = Message(text=text, chat_id=chat_id, sender=bot.username)
+    db_sess.add(message)
+    db_sess.commit()
+    # db_sess.close()
+    aasitc = [sess for sess in WS.connected_clients if
+              sess.selected_chat_id == chat_id]
+    for sess in aasitc:
+        async def f():
+            await sess.websocket.send(
+                json.dumps({"type": "new_msg_in_your_chat",
+                            "message": {"msg_text": text,
+                                        "msg_sender": bot.username,
+                                        "msg_time": str(
+                                            message.date)}}))
 
-            asyncio.run(f())
-        return message.get_information()
-    return {"responce": "Invalid bot"}
+        asyncio.run(f())
+    return message.get_information()
+
+
+def BotApi_get_chats(token=''):
+    check_bot(token)
+    print(token)
+    bot = db_sess.query(Bot).filter(Bot.token == token).first()
+    answer = []
+    chats_id = tuple(map(int, bot.chats.split(';')))
+    for chat_id in chats_id:
+        chat = db_sess.get(Chat, chat_id)
+        answer.append(chat.get_information())
+    return answer
 
 
 @app.route('/bot/<path:path>')
 def bot_http_api(path):
     bot_token = request.args.get("token")
-
+    check_bot(bot_token)
     if path == "get_msgs":
         return jsonify(BotApi_get_msgs(bot_token,
-                               last_id=int(request.args.get("last_id"))))
+                                       last_id=int(
+                                           request.args.get("last_id"))))
     if path == 'send_msg':  # для добавления сообщения нужен токен бота, текст, id чата
         return BotApi_send_msg(bot_token, text=request.args.get("text"),
                                chat_id=request.args.get("chat_id"))
-
-    # else:
-    #     return {'error': 'no such bot with this token'}
+    if path == 'get_chats':
+        return BotApi_get_chats(bot_token)
     return 'unknown request'
 
 
@@ -392,6 +401,11 @@ def check_user_chat(user: User, chat_id: int):
 
 
 WS.new_msg_func = new_message
+
+
+def check_bot(token: str):
+    if db_sess.query(Bot).filter(Bot.token == token).first() is None:
+        return {'error': 'invalid token'}
 
 
 def create_bot_creator():

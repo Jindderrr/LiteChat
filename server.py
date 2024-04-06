@@ -267,61 +267,79 @@ def check_registration(path):  # эта функция для обработки
         user_chats_id = user.chats.split(';')
         if user_chats_id == ['']:
             return []
-        answer = []
+        answer = {}
+        known_users = []
+        user_chats = []
         for chat_id in user_chats_id:
             chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
-            if chat.type == 'single':
+            if chat.type == 'single' or chat.type == 'group':
+                print(chat.users)
                 chat_name = chat.users.split(';')
                 chat_name.remove(username)
                 interlocutor = db_sess.query(User).filter(
                     User.username == chat_name[0]).first()
-                if interlocutor is None:
+                if interlocutor is None: # ищем в ботах
                     interlocutor = db_sess.query(Bot).filter(
                         Bot.username == chat_name[0]).first()
-                chat_name = interlocutor.name
-                chat_ico = interlocutor.username
+                if interlocutor is not None:
+                    known_users.append(interlocutor.username)
+                    chat_name = interlocutor.name
+                    chat_ico = interlocutor.username
+                else:
+                    return {'error': 'can not find user'}
             if len(chat.messages) == 0:
-                answer.append({'chat_id': chat.id,
-                               "chat_name": chat_name,
-                               "chat_type": chat.type,
-                               "chat_ico": chat_ico,
-                               "number_of_unread_messages": chat.unread_messages,
-                               "chat_last_message": {
-                                   "message_text": '',
-                                   "message_sender": '',
-                                   "message_date": ''}})
+                user_chats.append({'chat_id': chat.id,
+                                   "chat_name": chat_name,
+                                   "chat_type": chat.type,
+                                   "chat_ico": chat_ico,
+                                   "number_of_unread_messages": chat.unread_messages,
+                                   "chat_last_message": {
+                                       "message_text": '',
+                                       "message_sender": '',
+                                       "message_date": ''}})
             else:
                 last_mess = \
                     sorted(chat.messages, key=lambda x: x.id, reverse=True)[0]
-                answer.append({'chat_id': chat.id,
-                               "chat_name": chat_name,
-                               "chat_ico": chat_ico,
-                               "chat_type": chat.type,
-                               "number_of_unread_messages": chat.unread_messages,
-                               "chat_last_message": {
-                                   "message_text": last_mess.text,
-                                   "message_sender": last_mess.sender,
-                                   "message_date": last_mess.date}})
+                user_chats.append({'chat_id': chat.id,
+                                   "chat_name": chat_name,
+                                   "chat_ico": chat_ico,
+                                   "chat_type": chat.type,
+                                   "number_of_unread_messages": chat.unread_messages,
+                                   "chat_last_message": {
+                                       "message_text": last_mess.text,
+                                       "message_sender": last_mess.sender,
+                                       "message_date": last_mess.date}})
+        answer['chats_and_groups'] = user_chats
+        answer['known_users'] = known_users
+        print(answer)
         return answer
-    if path == 'start_group':
+    if path == 'start_group':  # для создания группы нужно больше 2 человек, хеш.пароль создателя,
+        # username всех участников
         pass_hash = request.args.get('password_hash')
-        users = list(map(int, request.args.get('users').split(
-            ',')))  # users задаются запросом users=1,2,3....?
+        chat_name = request.args.get('chat_name')
+        users = request.args.get('users').split(
+            ',')  # users задаются запросом users=1,2,3....?
+        creator = db_sess.query(User).filter(
+            User.hashed_password == pass_hash)
         if len(users) < 2:
             return {'error': 'add two or more users'}
-        for user_id in users:
-            if db_sess.get(User, user_id):
+        for username in users:
+            if db_sess.query(User).filter(User.username == username):
                 pass
             else:
-                return {'error': f'no such user with this id: {user_id}'}
-        if db_sess.query(User).filter(
-                User.hashed_password == pass_hash) is None:
+                return {'error': f'no such user with this username: {username}'}
+        if creator is None:
             return {'error': 'this hashed password is incorrect'}
         chat = Chat(type='group',
-                    users=';'.join(list(map(str, users))))
+                    users=';'.join(users),
+                    administrators=creator.username,
+                    name=chat_name)
         db_sess.add(chat)
         db_sess.commit()
-        # db_sess.close()
+        for username in users:
+            user = db_sess.get(User, username)
+            user.add_chat(chat.id)
+        db_sess.commit()
         return f'added group: {chat.id}'
     return {"response": False}
 

@@ -59,8 +59,9 @@ array[
 ]
 
 
-In order to send a message, send a request like: "http://127.0.0.1:8080/bot/send_msg ?token=[your bot's token]&chat_id=[id of the chat you are sending a message to]&text=[message text]";
+In order to send a message, send a request like: "http://127.0.0.1:8080/bot/send_msg?token=[your bot's token]&chat_id=[id of the chat you are sending a message to]&text=[message text]";
 
+In order to get all chats with bots, send a request like "http://127.0.0.1:8080/bot/get_chats?token=your bots's token. You will get an array, like [{id:1/2/N, users:'useranme1;username2;usernameN',unread_messages:1/2/N,type:'single/group'},...]
 
 I hope I helped you figure out our api, if you still have questions, then you can contact the support service."""
 

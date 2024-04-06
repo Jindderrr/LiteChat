@@ -31,8 +31,10 @@ function scrollChatDown() {
 
 // chats_menu
 let chats = []
+let known_users
 request(`/request/get_my_chats?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}`, function(response) {
-    chats = response
+    chats = response["chats_and_groups"]
+    known_users = response["known_users"]
     UpdateChats()
 })
 
@@ -46,6 +48,7 @@ function autoResize() {
     textarea.style.height = textarea.scrollHeight + 0 + 'px'
 }
 autoResize()
+
 
 
 function changeFon() {
@@ -62,6 +65,19 @@ function changeTheme() {
     if (theme == THEMES_CLASSES.length) {theme = 0}
     document.documentElement.classList.add(THEMES_CLASSES[theme])
     setCookie("theme", theme)
+    if (theme == 1 || theme == 2) {
+        let jc = "w"
+        if (theme == 2) { jc = "b" }
+        for (let n = 0; n < JN; n++) {
+            let j = document.getElementById("J" + n)
+            //alert(j.src)
+            if (j.src[j.src.length-15] == "1") {
+                j.src = '/front/main/1jackdaws_'+jc+'.svg'
+            } else {
+                j.src = '/front/main/2jackdaws_'+jc+'.svg'
+            }
+        }
+    }
 } document.documentElement.classList.add(THEMES_CLASSES[cookies["theme"]])
 
 function printPlaceholder() {
@@ -118,6 +134,7 @@ function resize_chat_text_box() {
 }
 
 function select_chat(i) {
+    JN = 0
     if (SelectedChat != -1) {
         let elem = document.getElementById("onmouse_div_" + SelectedChat)
         elem.style.backgroundColor = NO_SELECTED_CHAT_COLOR
@@ -205,17 +222,27 @@ function autoScroll() {
 }
 
 
+let JN = 0
 function add_msg(msgText, sender_username) {
     let whose_msg = Number(cookies["username"] != sender_username)
     msgText = format_msg_text(msgText)
+    theme = Number(getCookie("theme")) + 1
     LAST_MSG_INDEX += 1
+    let jc = "b"
+    if (theme == 2) { jc = "w" }
     let html = `
         <div class="message_box" style="justify-content: ${["end", "start", "center"][whose_msg]};">
             <div id="message_${LAST_MSG_INDEX}" class="${["my_message", "no_my_message", "notification_message"][whose_msg]}">
                 ${msgText}
+                <span class="my_message_time">
+                15:40
+                <img id="J${JN}" src=/front/main/2jackdaws_${jc}.svg class="jackdaw_svg"></img>
+                </span>
             </div>
+            
         </div>
     `
+    JN++
     document.getElementById("message_container").innerHTML += html
 }
 

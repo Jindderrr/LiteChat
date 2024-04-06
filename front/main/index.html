@@ -29,7 +29,7 @@
             </div>
         </div>
         <div id="chat_text_input_container" class="chat_text_input_container"> 
-            <textarea id="message_textarea" class="input_box" oninput="autoResize()" rows="1" placeholder=""></textarea>
+            <textarea id="message_textarea" class="input_box" oninput="autoResize()" rows="1" placeholder="" wrap="soft"></textarea>
             <div class="message_right_buttons">
                 <button class="smiles_message_button" onclick=""> 🙂 </button>
                 <button class="send_message_button" value="send" onclick="send_msg()"> send </button>
@@ -41,7 +41,6 @@
                 <div id="top_text" class="top_text"> </div>
             </div>
         </div>
-        
         <div id="left_panel_container" class="left_panel_container">
             <button class="left_panel_buttons add_chat_button" onclick="newChat()">+</button>
             <button class="left_panel_buttons" onclick="settings()">s</button>

@@ -189,11 +189,13 @@ button:active {
 .my_message, .no_my_message, .notification_message {
     position: relative;
     width: max-content;
-    word-break: break-all;
+    word-break: break-word;
+    min-width: 32px;
 }
 .my_message, .no_my_message{
     max-width: 55%;
     padding: 10px;
+    /* padding-bottom: 22px; */
     font-size: 16px;
 }
 .my_message {
@@ -207,7 +209,8 @@ button:active {
     border-radius: 19px 19px 19px 2px;
     background-color: var(--no-my-msg-color);
     transition: background-color 0.3s;
-}.notification_message {
+}
+.notification_message {
     max-width: 70%;
     padding: 8px;
     margin-top: 12px;
@@ -215,6 +218,21 @@ button:active {
     font-size: 14px;
     border-radius: 15px;
     background-color: rgba(235, 214, 200, 0.5);
+}
+.my_message_time {
+    position: relative;
+    padding-left: 7px;
+    top: 8px;
+    float: right;
+    font-size: 12px;
+    color: var(--my-message-time-color);
+}
+
+.jackdaw_svg {
+    position: relative;
+    top: 2px;
+    height: 12px;
+    width: 12px;
 }
 .chat_text_input_container {
     position: absolute;

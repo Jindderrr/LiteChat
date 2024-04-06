@@ -1,5 +1,3 @@
-import uuid
-
 import sqlalchemy
 from flask_login import UserMixin
 from sqlalchemy import orm
@@ -31,9 +29,9 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def get_information(self):
         return {'id': self.id,
-                'bot': self.bot,
                 'name': self.name,
                 'username': self.username,
                 'email': self.email,
-                'chats': self.chats
+                'chats': self.chats,
+                'bots': self.bots
                 }

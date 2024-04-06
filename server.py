@@ -3,8 +3,9 @@ import random
 from email.mime.multipart import MIMEMultipart
 
 import asyncio
-from flask import Flask, request, send_from_directory, jsonify
-from flask_restful import Api
+
+from flask import Flask, request, send_from_directory, jsonify, Blueprint
+from werkzeug.security import generate_password_hash
 
 import format_msg
 from config import EMAIL_LOGIN, EMAIL_PASSWORD
@@ -21,10 +22,42 @@ from data_py.chats import Chat
 import bot_BotCreator
 
 app = Flask(__name__)
-api = Api(app)
 USERS_REGISTERING_NOW = {}
 db_session.global_init('db/messenger.db')
 db_sess = db_session.create_session()
+blueprint = Blueprint(
+    'chat_api',
+    __name__
+)
+
+
+@blueprint.route('/api/get_chats', methods=['GET'])
+def get_chats():
+    username = request.args['username']
+    user = db_sess.query(User).filter(User.username == username).first()
+    password = request.args['password']
+    if not user.check_password(password):
+        return {'access denied': 'wrong username or password'}
+    chats = user.chats.split(';')
+    answer = []
+    for chat_id in chats:
+        chat = db_sess.get(Chat, int(chat_id))
+        answer.append(chat.get_information())
+    return answer
+
+
+@blueprint.route('/api/send_message', methods=['POST'])
+def send_msg():
+    username = request.args['username']
+    user = db_sess.query(User).filter(User.username == username).first()
+    password = request.args['password']
+    if not user.check_password(password):
+        return {'access denied': 'wrong username or password'}
+    message = Message(text=request.args['text'],
+                      chat_id=request.args['chat_id'],
+                      sender=username)
+    db_sess.add(message)
+    db_sess.commit()
 
 
 def BotApi_get_msgs(token="", **args):
@@ -278,7 +311,7 @@ def check_registration(path):  # эта функция для обработки
                 chat_name.remove(username)
                 interlocutor = db_sess.query(User).filter(
                     User.username == chat_name[0]).first()
-                if interlocutor is None: # ищем в ботах
+                if interlocutor is None:  # ищем в ботах
                     interlocutor = db_sess.query(Bot).filter(
                         Bot.username == chat_name[0]).first()
                 if interlocutor is not None:
@@ -327,7 +360,8 @@ def check_registration(path):  # эта функция для обработки
             if db_sess.query(User).filter(User.username == username):
                 pass
             else:
-                return {'error': f'no such user with this username: {username}'}
+                return {
+                    'error': f'no such user with this username: {username}'}
         if creator is None:
             return {'error': 'this hashed password is incorrect'}
         chat = Chat(type='group',
@@ -357,7 +391,7 @@ def get_file_in_front(filename):
         print(request.remote_addr + " запросил " + filename + " - ОТКАЗАНО!")
 
 
-def check_password_hash(user, pass_hash):
+def check_password_hash(user: User, pass_hash: str):
     if user.hashed_password != pass_hash:
         return {"response": False, 'error': 'Hash does not match'}
 
@@ -448,4 +482,6 @@ if __name__ == '__main__':
     bot_BotCreator.start(BotApi_get_msgs, BotApi_send_msg, token=creator_token)
     print("окно регистрации тут - http://127.0.0.1:8080/registration")
     print("окно входа тут - http://127.0.0.1:8080/login")
+
+    app.register_blueprint(blueprint)
     app.run(port=8080, host='127.0.0.1')

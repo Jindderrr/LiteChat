@@ -329,3 +329,38 @@ document.getElementById('fileInput').addEventListener('change', function() {
         }, 1000)
     }
 })
+
+function createGroupPopUp() {
+    document.getElementById("pop-up_window_container").style.visibility = "visible"
+    document.getElementById("create_group_container").style.visibility = "visible"
+    document.getElementById("create_group_known_users").innerHTML = ""
+    for (let usr of known_users) {
+        document.getElementById("create_group_known_users").innerHTML += `
+        <div id="UserContainerInCreateGroupPopUp_${usr["username"]}" class="create_group_known_user_info_container" onclick="selectUserInCreateGroupPopUp('${usr["username"]}')">
+            <div class="create_group_known_user_info">
+                <img src=/front/icons/${usr["username"]}.jpg class="chat_ico">
+                <span style="padding-left: 12px;">${usr["name"]}</span>
+            </div>
+        </div>
+        `
+    }
+}
+
+let selectedUsersInCreateGroupPopUp = []
+function selectUserInCreateGroupPopUp(user) {
+    if (selectedUsersInCreateGroupPopUp.includes(user)) {
+        document.getElementById("UserContainerInCreateGroupPopUp_" + user).classList.remove("create_group_known_user_info_container_selected")
+        selectedUsersInCreateGroupPopUp = selectedUsersInCreateGroupPopUp.filter(item => item != user)
+    } else {
+        document.getElementById("UserContainerInCreateGroupPopUp_" + user).classList.add("create_group_known_user_info_container_selected")
+        selectedUsersInCreateGroupPopUp.push(user)
+    }
+    document.getElementById("selectedUsersInCreateGroupPopUp").innerHTML = selectedUsersInCreateGroupPopUp.join(", ")
+}
+
+function createGroupApply() {
+    let group_name = document.getElementById("create_group_name").value
+    if (group_name != "" && selectedUsersInCreateGroupPopUp.length != 0) {
+        request(`/request/start_group?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&chat_name=${group_name}&users=${selectedUsersInCreateGroupPopUp.join(",")},${cookies["username"]}`)
+    }
+}

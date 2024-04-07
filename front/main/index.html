@@ -37,7 +37,7 @@
         </div>
         <div id="chats_container_top" class="chats_container_top">
             <div class="top_info_container">
-                <img id="selected_chat_ico" src=/front/main/ico_1.png class="chat_ico">
+                <img id="selected_chat_ico" class="chat_ico">
                 <div id="top_text" class="top_text"> </div>
             </div>
         </div>
@@ -46,6 +46,7 @@
             <button class="left_panel_buttons" onclick="settings()">s</button>
             <button class="left_panel_buttons" onclick="changeTheme()">t</button>
             <button class="left_panel_buttons" onclick="changeFon()">f</button>
+            <button class="left_panel_buttons" onclick="createGroupPopUp()">g</button>
         </div>
         <div class="middle_container">
             <div id="chats_container" class="chats_container"> </div>
@@ -60,6 +61,14 @@
             </div>
         </div>
         <input type="file" id="fileInput" style="display: none">
+        <div id="pop-up_window_container" class="pop-up_window_container">
+            <div id="create_group_container" class="create_group_container">
+                <input id="create_group_name" class="create_group_name" placeholder="group name" maxlength="30">
+                <div id="create_group_known_users" class="create_group_known_users"> </div>
+                <div id="selectedUsersInCreateGroupPopUp" class="selectedUsersInCreateGroupPopUp">das</div>
+                <button class="create_group_apply_button" onclick="createGroupApply()"> apply </button>
+            </div>
+        </div>
     </body>
 </html>
 

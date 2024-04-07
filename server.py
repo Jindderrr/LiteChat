@@ -351,10 +351,8 @@ def check_registration(path):  # эта функция для обработки
         # username всех участников
         pass_hash = request.args.get('password_hash')
         chat_name = request.args.get('chat_name')
-        users = request.args.get('users').split(
-            ',')  # users задаются запросом users=1,2,3....?
-        creator = db_sess.query(User).filter(
-            User.hashed_password == pass_hash)
+        users = request.args.get('users').split(',') # users задаются запросом users=1,2,3....?
+        creator = db_sess.query(User).filter(User.hashed_password == pass_hash).first()
         if len(users) < 2:
             return {'error': 'add two or more users'}
         for username in users:
@@ -372,11 +370,13 @@ def check_registration(path):  # эта функция для обработки
         db_sess.add(chat)
         db_sess.commit()
         for username in users:
-            user = db_sess.get(User, username)
+            user = db_sess.query(User).filter(User.username == username).first()
+            if user is None:
+                user = db_sess.query(Bot).filter(Bot.username == username).first()
             user.add_chat(chat.id)
         db_sess.commit()
-        return f'added group: {chat.id}'
-    return {"response": False}
+        return jsonify({'added group': chat.id})
+    return jsonify({"response": False})
 
 
 @app.route('/front/<path:filename>')

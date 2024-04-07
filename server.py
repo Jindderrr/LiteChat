@@ -315,7 +315,8 @@ def check_registration(path):  # эта функция для обработки
                     interlocutor = db_sess.query(Bot).filter(
                         Bot.username == chat_name[0]).first()
                 if interlocutor is not None:
-                    known_users.append(interlocutor.username)
+                    known_users.append({'username': interlocutor.username,
+                                        'name': interlocutor.name})
                     chat_name = interlocutor.name
                     chat_ico = interlocutor.username
                 else:

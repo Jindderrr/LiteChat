@@ -61,8 +61,8 @@
             </div>
         </div>
         <input type="file" id="fileInput" style="display: none">
-        <div id="pop-up_window_container" class="pop-up_window_container">
-            <div id="create_group_container" class="create_group_container">
+        <div id="pop-up_window_container" class="pop-up_window_container" onclick="closeAll_pop_up_windows()">
+            <div id="create_group_container" class="create_group_container" onclick="event.stopPropagation();">
                 <input id="create_group_name" class="create_group_name" placeholder="group name" maxlength="30">
                 <div id="create_group_known_users" class="create_group_known_users"> </div>
                 <div id="selectedUsersInCreateGroupPopUp" class="selectedUsersInCreateGroupPopUp">das</div>

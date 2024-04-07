@@ -330,6 +330,11 @@ document.getElementById('fileInput').addEventListener('change', function() {
     }
 })
 
+function closeAll_pop_up_windows() {
+    document.getElementById("pop-up_window_container").style.visibility = "hidden"
+    document.getElementById("create_group_container").style.visibility = "hidden"
+}
+
 function createGroupPopUp() {
     document.getElementById("pop-up_window_container").style.visibility = "visible"
     document.getElementById("create_group_container").style.visibility = "visible"
@@ -362,5 +367,10 @@ function createGroupApply() {
     let group_name = document.getElementById("create_group_name").value
     if (group_name != "" && selectedUsersInCreateGroupPopUp.length != 0) {
         request(`/request/start_group?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}&chat_name=${group_name}&users=${selectedUsersInCreateGroupPopUp.join(",")},${cookies["username"]}`)
+        closeAll_pop_up_windows()
+    } else {
+        if (group_name == "") { alert("You must specify the name of the group!") }
+        else if (selectedUsersInCreateGroupPopUp.length == 0) { alert("You need to select at least one participant!") }
     }
 }
+

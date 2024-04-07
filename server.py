@@ -169,7 +169,13 @@ def check_registration(path):  # эта функция для обработки
 
     if path == "registration/check_username":  # ->->->
         a_username = request.args.get("username")
-        username_is_free = len([c for c in a_username if c not in "0123456789"]) != 0 and not db_sess.query(User).filter(User.username == a_username).first()  # username свободен?
+        if a_username[-3:] == 'bot':
+            return jsonify(
+                {'error': 'can not create user with bot at the end'})
+        username_is_free = len([c for c in a_username if
+                                c not in "0123456789"]) != 0 and not db_sess.query(
+            User).filter(
+            User.username == a_username).first()  # username свободен?
         print("username is free: " + username_is_free)
         return jsonify(username_is_free)  # <-<-<-
 
@@ -308,13 +314,16 @@ def check_registration(path):  # эта функция для обработки
                 print(chat.users)
                 chat_name = chat.users.split(';')
                 chat_name.remove(username)
-                interlocutor = db_sess.query(User).filter(User.username == chat_name[0]).first()
+                interlocutor = db_sess.query(User).filter(
+                    User.username == chat_name[0]).first()
                 if interlocutor is None:  # ищем в ботах
-                    interlocutor = db_sess.query(Bot).filter(Bot.username == chat_name[0]).first()
+                    interlocutor = db_sess.query(Bot).filter(
+                        Bot.username == chat_name[0]).first()
                 if interlocutor is not None:
                     if chat.type == 'single':
                         chat_name = interlocutor.name
-                        known_users.append({'username': interlocutor.username, 'name': interlocutor.name})
+                        known_users.append({'username': interlocutor.username,
+                                            'name': interlocutor.name})
                     else:
                         chat_name = "GroupName"
                     chat_ico = interlocutor.username
@@ -348,10 +357,16 @@ def check_registration(path):  # эта функция для обработки
         return answer
     if path == 'start_group':  # для создания группы нужно больше 2 человек, хеш.пароль создателя,
         # username всех участников
+        creator_username = request.args.get('creator_username')
         pass_hash = request.args.get('password_hash')
         chat_name = request.args.get('chat_name')
-        users = request.args.get('users').split(',') # users задаются запросом users=1,2,3....?
-        creator = db_sess.query(User).filter(User.hashed_password == pass_hash).first()
+        users = request.args.get('users').split(
+            ',')  # users задаются запросом users=1,2,3....?
+        creator = db_sess.query(User).filter(
+            User.username == creator_username).first()
+        if creator is None:
+            return jsonify({'error': 'no such user with this username'})
+        check_password_hash(creator, pass_hash)
         if len(users) < 2:
             return {'error': 'add two or more users'}
         for username in users:
@@ -369,9 +384,10 @@ def check_registration(path):  # эта функция для обработки
         db_sess.add(chat)
         db_sess.commit()
         for username in users:
-            user = db_sess.query(User).filter(User.username == username).first()
+            user = find_user(username)
             if user is None:
-                user = db_sess.query(Bot).filter(Bot.username == username).first()
+                user = db_sess.query(Bot).filter(
+                    Bot.username == username).first()
             user.add_chat(chat.id)
         db_sess.commit()
         return jsonify({'added group': chat.id})
@@ -406,8 +422,7 @@ def new_message(msg, web_socket: WS.WebSocket):
         if msg_type == "send_msg":
             username = web_socket.init_info["username"]
             chat_id = args["chat_id"]
-            user = db_sess.query(User).filter(
-                User.username == username).first()
+            user = find_user(username)
             check_user_chat(user, chat_id)
 
             msg_text = format_msg.format(args["msg_text"])
@@ -472,6 +487,11 @@ def create_bot_creator():
         bot_creator.set_token()
         db_sess.add(bot_creator)
         db_sess.commit()
+
+
+def find_user(username: str or User.username):
+    return db_sess.query(User).filter(
+        User.username == username).first()
 
 
 if __name__ == '__main__':

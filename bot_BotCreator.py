@@ -1,6 +1,5 @@
 import time
 from threading import Thread
-from data_py import db_session
 from data_py.bots import Bot
 from data_py.users import User
 from server import db_sess

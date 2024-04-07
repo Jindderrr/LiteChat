@@ -1,7 +1,0 @@
-.chat_container {
-    overflow-y:scroll; 
-    position: relative;  
-    width: 450px;
-    height: 100%;
-    left: 50px;
-}

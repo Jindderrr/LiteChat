@@ -169,8 +169,7 @@ def check_registration(path):  # эта функция для обработки
 
     if path == "registration/check_username":  # ->->->
         a_username = request.args.get("username")
-        username_is_free = not db_sess.query(User).filter(
-            User.username == a_username).first()  # username свободен?
+        username_is_free = len([c for c in a_username if c not in "0123456789"]) != 0 and not db_sess.query(User).filter(User.username == a_username).first()  # username свободен?
         print("username is free: " + username_is_free)
         return jsonify(username_is_free)  # <-<-<-
 
@@ -309,15 +308,15 @@ def check_registration(path):  # эта функция для обработки
                 print(chat.users)
                 chat_name = chat.users.split(';')
                 chat_name.remove(username)
-                interlocutor = db_sess.query(User).filter(
-                    User.username == chat_name[0]).first()
+                interlocutor = db_sess.query(User).filter(User.username == chat_name[0]).first()
                 if interlocutor is None:  # ищем в ботах
-                    interlocutor = db_sess.query(Bot).filter(
-                        Bot.username == chat_name[0]).first()
+                    interlocutor = db_sess.query(Bot).filter(Bot.username == chat_name[0]).first()
                 if interlocutor is not None:
-                    known_users.append({'username': interlocutor.username,
-                                        'name': interlocutor.name})
-                    chat_name = interlocutor.name
+                    if chat.type == 'single':
+                        chat_name = interlocutor.name
+                        known_users.append({'username': interlocutor.username, 'name': interlocutor.name})
+                    else:
+                        chat_name = "GroupName"
                     chat_ico = interlocutor.username
                 else:
                     return {'error': 'can not find user'}
@@ -344,8 +343,8 @@ def check_registration(path):  # эта функция для обработки
                                        "message_sender": last_mess.sender,
                                        "message_date": last_mess.date}})
         answer['chats_and_groups'] = user_chats
-        answer['known_users'] = known_users
-        print(answer)
+        answer['known_users'] = list(tuple(known_users))
+        print(tuple(known_users))
         return answer
     if path == 'start_group':  # для создания группы нужно больше 2 человек, хеш.пароль создателя,
         # username всех участников

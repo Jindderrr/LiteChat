@@ -32,3 +32,17 @@ class Chat(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def add_user(self, user):
         self.users += f';{user}'
+
+    def delete_administrator(self, username):
+        if username in self.administrators:
+            admins = self.administrators[:].split(';')
+            admins.remove(username)
+            self.administrators = ';'.join(admins)
+        else:
+            return 'no such admin'
+
+    def delete_user(self, username):
+        if username in self.users:
+            users = self.users[:].split(';')
+            users.remove(username)
+            self.users = users

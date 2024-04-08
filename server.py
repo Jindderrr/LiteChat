@@ -73,7 +73,7 @@ def BotApi_get_msgs(token="", **args):
     for chat_id in bot_chats:
         chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
         if chat is not None:
-            messages = chat.messages[last_id:]
+            messages = [mess for mess in chat.messages if mess.id > last_id]
             for mess in messages:
                 if mess.sender[-3:] != 'bot':
                     answer.append(
@@ -94,7 +94,8 @@ def BotApi_send_msg(token="", **args):
     db_sess.add(message)
     db_sess.commit()
     # db_sess.close()
-    aasitc = [sess for sess in WS.connected_clients if sess.selected_chat_id == chat_id]
+    aasitc = [sess for sess in WS.connected_clients if
+              sess.selected_chat_id == chat_id]
     for sess in aasitc:
         async def f():
             sess.send_msg(
@@ -354,7 +355,7 @@ def check_registration(path):  # эта функция для обработки
         return answer
     if path == 'start_group':  # для создания группы нужно больше 2 человек, хеш.пароль создателя,
         # username всех участников
-        creator_username = request.args.get('creator_username')
+        creator_username = request.args.get('username')
         pass_hash = request.args.get('password_hash')
         chat_name = request.args.get('chat_name')
         users = request.args.get('users').split(
@@ -455,6 +456,54 @@ def new_message(msg, web_socket: WS.WebSocket):
             web_socket.send_msg(json.dumps(answer))
             print('chats have sent')
             web_socket.selected_chat_id = args['selected_chat_id']
+        elif msg_type == 'add_administrator':  # для добавления админа нужны username добвляющего и добавляемого, id группы
+            editor = args['editor']
+            username = args['username']
+            group_id = args['group_id']
+            group = db_sess.get(Chat, group_id)
+            check_admins_editor(group, editor)
+            if group.type == 'group' and username not in group.administrators:
+                group.add_administrator(username)
+                db_sess.commit()
+                return jsonify({'success': 'user added to group'})
+            else:
+                return jsonify({'error': 'user already in administrators'})
+        elif msg_type == 'delete_administrator':
+            editor = args['editor']
+            username = args['username']
+            group_id = args['group_id']
+            group = db_sess.get(Chat, group_id)
+            check_admins_editor(group, editor)
+            if username == group.administrators.split(';')[0]:
+                group.delete_administrator(username)
+                db_sess.commit()
+            else:
+                return jsonify({'error': 'no such administrator'})
+        elif msg_type == 'add_user':
+            editor = args['editor']
+            username = args['username']
+            group_id = args['group_id']
+            group = db_sess.get(Chat, group_id)
+            if editor in group.administrators.split(';'):
+                group.add_user(username)
+            else:
+                return jsonify({'error': 'have no rights'})
+        elif msg_type == 'delete_user':
+            editor = args['editor']
+            username = args['username']
+            group_id = args['group_id']
+            group = db_sess.get(Chat, group_id)
+
+            if editor in group.administrators and username in group.administrators:
+                if editor == group.administrators.split(';')[0]:
+                    group.delete_user(username)
+                else:
+                    return jsonify(
+                        {'error': 'you must be chat creator to delete admin'})
+            elif editor in group.administrators:
+                group.delete_user(username)
+            else:
+                return jsonify({'error': 'have no rights'})
 
 
 def check_user_chat(user: User, chat_id: int):
@@ -489,6 +538,12 @@ def create_creator_bot():
 def find_user(username: str or User.username):
     return db_sess.query(User).filter(
         User.username == username).first()
+
+
+def check_admins_editor(group: Chat, editor: str):
+    if editor != group.administrators.split(';')[0]:
+        return jsonify(
+            {'error': 'editor has no right for adding administrator'})
 
 
 if __name__ == '__main__':

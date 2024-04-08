@@ -73,9 +73,9 @@ def BotApi_get_msgs(token="", **args):
     for chat_id in bot_chats:
         chat = db_sess.query(Chat).filter(Chat.id == chat_id).first()
         if chat is not None:
-            messages = [msg for msg in chat.messages if msg.id > last_id]
+            messages = chat.messages[last_id:]
             for mess in messages:
-                if mess.sender != 'bot_creator':
+                if mess.sender[-3:] != 'bot':
                     answer.append(
                         {"sender": mess.sender,
                          "text": mess.text,
@@ -83,7 +83,7 @@ def BotApi_get_msgs(token="", **args):
                          "message_id": mess.id,
                          "chat_id": mess.chat_id})
     # answer - сообщения полученные ботом, id которых больше last_id
-    # db_sess.close()
+    print(answer)
     return answer
 
 
@@ -112,7 +112,6 @@ def BotApi_send_msg(token="", **args):
 
 def BotApi_get_chats(token=''):
     check_bot(token)
-    print(token)
     bot = db_sess.query(Bot).filter(Bot.token == token).first()
     answer = []
     chats_id = tuple(map(int, bot.chats.split(';')))
@@ -475,17 +474,17 @@ def check_bot(token: str):
         return {'error': 'invalid token'}
 
 
-def create_bot_creator():
-    bot_creator = db_sess.query(Bot).filter(
-        Bot.username == 'bot_creator').first()
-    if bot_creator:
+def create_creator_bot():
+    creator_bot = db_sess.query(Bot).filter(
+        Bot.username == 'creator_bot').first()
+    if creator_bot:
         pass
     else:
-        bot_creator = Bot(username='bot_creator',
+        creator_bot = Bot(username='creator_bot',
                           name='Bot Creator'
                           )
-        bot_creator.set_token()
-        db_sess.add(bot_creator)
+        creator_bot.set_token()
+        db_sess.add(creator_bot)
         db_sess.commit()
 
 
@@ -495,9 +494,9 @@ def find_user(username: str or User.username):
 
 
 if __name__ == '__main__':
-    create_bot_creator()
+    create_creator_bot()
     creator_token = db_session.create_session().query(Bot).filter(
-        Bot.username == 'bot_creator').first().token
+        Bot.username == 'creator_bot').first().token
 
     bot_BotCreator.start(BotApi_get_msgs, BotApi_send_msg, token=creator_token)
     print("окно регистрации тут - http://127.0.0.1:8080/registration")

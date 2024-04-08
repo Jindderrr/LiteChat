@@ -15,12 +15,12 @@ WS.onmessage = function(event) {
         document.getElementById("message_container").innerHTML= ""
         LAST_MSG_INDEX = 0
         for (let msg of data["all_messages"]) {
-            add_msg(msg["msg_text"], msg["msg_sender"])
+            add_msg(msg["msg_text"], msg["msg_sender"], msg["msg_time"])
             console.log(msg["msg_text"])
         }
         scrollChatDown()
     } else if (data["type"] == "new_msg_in_your_chat") {
-        add_msg(data["message"]["msg_text"], data["message"]["msg_sender"])
+        add_msg(data["message"]["msg_text"], data["message"]["msg_sender"], data["message"]["msg_time"])
         scrollChatDown()
     }
 }
@@ -223,20 +223,27 @@ function autoScroll() {
 
 
 let JN = 0
-function add_msg(msgText, sender_username) {
+function add_msg(msgText, sender_username, date = "Sun, 07 Apr 2024 16:52:43 GMT") {
     let whose_msg = Number(cookies["username"] != sender_username)
     msgText = format_msg_text(msgText)
     theme = Number(getCookie("theme")) + 1
     LAST_MSG_INDEX += 1
     let jc = "b"
     if (theme == 2) { jc = "w" }
+    date = new Date(date)
+    let min = String(date.getMinutes())
+    let hour = String(date.getHours())
+    if(min.length == 1) { min = "0" + min }
+    if(hour.length == 1) { hour = "0" + hour }
+    date = hour + ":" + min
+    jf = () => {if (sender_username == cookies['username']) { return `<img id="J${JN}" src=/front/main/2jackdaws_${jc}.svg class="jackdaw_svg"></img>`} else { return ""} }
     let html = `
         <div class="message_box" style="justify-content: ${["end", "start", "center"][whose_msg]};">
             <div id="message_${LAST_MSG_INDEX}" class="${["my_message", "no_my_message", "notification_message"][whose_msg]}">
                 ${msgText}
                 <span class="my_message_time">
-                15:40
-                <img id="J${JN}" src=/front/main/2jackdaws_${jc}.svg class="jackdaw_svg"></img>
+                ${date}
+                ${jf()}
                 </span>
             </div>
             

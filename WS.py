@@ -12,11 +12,22 @@ class WebSocket:
         self.selected_chat_id = None
 
     def send_msg(self, msgText):
-        asyncio.create_task(_send_msg_as(msgText, self.websocket))
+        if asyncio.create_task(_send_msg_as(msgText, self.websocket)) == None:
+            print(connected_clients.index(self))
+
 
 
 async def _send_msg_as(msg, websocket):
-    await websocket.send(msg)
+    try:
+        await websocket.send(msg)
+        return True
+    except websockets.exceptions:
+        for i in range(len(connected_clients)):
+            if connected_clients[i].websocket == websocket:
+                connected_clients.pop(i)
+                break
+        await websocket.close()
+        print("WebSocket соединение с клиентом было закрыто")
 
 
 async def _main(websocket):
@@ -44,8 +55,7 @@ def run():
 def check_hones_func(user_info: dict):
     db_session.global_init('db/messenger.db')
     db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(
-        User.username == user_info['username']).first()
+    user = db_sess.query(User).filter(User.username == user_info['username']).first()
     if user is not None:
         if user.hashed_password == user_info['password_hash']:
             return True

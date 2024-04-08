@@ -83,7 +83,6 @@ def BotApi_get_msgs(token="", **args):
                          "message_id": mess.id,
                          "chat_id": mess.chat_id})
     # answer - сообщения полученные ботом, id которых больше last_id
-    print(answer)
     return answer
 
 

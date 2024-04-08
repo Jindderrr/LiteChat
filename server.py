@@ -94,11 +94,10 @@ def BotApi_send_msg(token="", **args):
     db_sess.add(message)
     db_sess.commit()
     # db_sess.close()
-    aasitc = [sess for sess in WS.connected_clients if
-              sess.selected_chat_id == chat_id]
+    aasitc = [sess for sess in WS.connected_clients if sess.selected_chat_id == chat_id]
     for sess in aasitc:
         async def f():
-            await sess.websocket.send(
+            sess.send_msg(
                 json.dumps({"type": "new_msg_in_your_chat",
                             "message": {"msg_text": text,
                                         "msg_sender": bot.username,

@@ -35,7 +35,8 @@
                 <button class="send_message_button" value="send" onclick="send_msg()"> send </button>
             </div>
         </div>
-        <div id="chats_container_top" class="chats_container_top">
+        <div id="scroll_btn" class="scroll_btn" onclick='document.getElementById("message_container").scrollIntoView({behavior: "smooth", block: "end"})'> ▽ </div>
+        <div id="chats_container_top" class="chats_container_top" onclick="settingsGroup()">
             <div class="top_info_container">
                 <img id="selected_chat_ico" class="chat_ico">
                 <div id="top_text" class="top_text"> </div>
@@ -57,6 +58,13 @@
                     <div id="settings_row_name" class="settings_row"></div>
                     <div id="settings_row_email" class="settings_row"></div>
                     <div id="clk" class="settings_row settings_change_password_button"> change password </div>
+                </div>
+            </div>
+            <div id="settings_group_container" class="settings_group_container_hidden">
+                <img id="settings_group_ico" class="settings_head" onclick="openFileSelector()">
+                <div class="settings_group_users_box">
+                    <div class="group_users_container"> <div class="group_users_box"> <img src="/front/icons/test_bot.jpg" class="chat_ico"> </div> </div>
+                    <div class="group_users_container"></div>
                 </div>
             </div>
         </div>

@@ -66,13 +66,12 @@ button:active {
 .settings_container_hidden, .settings_container_visible {
     border-bottom: 1px solid black;
 }
-.settings_container_visible {
-    top: 0%;
-    transition: top 0.5s;
-}
 .settings_container_hidden {
-    top: -101%;
-    transition: top 0.3s;
+    bottom: 101%;
+    transition: bottom 0.5s;
+}
+.settings_container_visible {
+    bottom: 0%;
 }
 .settings_head {
     width: 40%;
@@ -100,6 +99,41 @@ button:active {
 }
 .settings_row:active {
     box-shadow: 0 0 10px var(--settings-row-color);
+}
+.settings_group_container_hidden {
+    position: absolute;
+    top: 101%;
+    transition: top 0.5s;
+    width: 100%;
+    min-height: 100%;
+    background-color: aqua;
+}
+.settings_group_container_visible {
+    top: 0%;
+}
+.settings_group_users_box {
+    background-color: bisque;
+    position: absolute;
+    width: 90%;
+    left: 5%;
+}
+.group_users_container {
+    background-color: blue;
+    border-radius: 15px;
+    height: 70px;
+    margin: 10px;
+}
+.group_users_box {
+    position: relative;
+    top: 10px;
+    left: 10px;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    background-color: rgb(230, 230, 230);
+    font-size: 22px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 .chat_fon_img {
     position: fixed;
@@ -129,6 +163,7 @@ button:active {
     background-color: var(--chat-top-info-color);
     transition: background-color 0.3s;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -176,7 +211,27 @@ button:active {
     color: rgba(0, 0, 0, 0.5);
     font-size: 14px;
 }
+.scroll_btn {
+    position: absolute;
+    right: -120px;
+    transition: right 0.2s;
+    bottom: 90px;
+    width: 60px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: rgb(231, 231, 204);
+    font-size: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.scroll_btn_vis {
+    right: 25px;
+}
 .messages_container {
+    position: relative;
+    top: 80px;
     display: flex;
     flex-direction: column;
 }

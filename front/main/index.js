@@ -1,3 +1,7 @@
+if (cookies["password_hash"] == undefined) {
+    window.location.href = "/login"
+}
+
 let IS_VERTICAL_MODE = false
 if (getCookie("theme") == undefined) { setCookie("theme", 0) }
 if (getCookie("nfon") == undefined) { setCookie("nfon", 0) }
@@ -34,6 +38,15 @@ let chats = []
 let known_users
 request(`/request/get_my_chats?username=${cookies["username"]}&password_hash=${cookies["password_hash"]}`, function(response) {
     chats = response["chats_and_groups"]
+    chats = chats.sort((a, b) => {
+        console.log(a)
+        a_d = new Date(a["chat_last_message"]["message_date"])
+        b_d = new Date(b["chat_last_message"]["message_date"])
+        console.log(new Date(a["chat_last_message"]["message_date"]))
+        if (a_d < b_d) {
+            return 1
+        } else { return -1 }
+    })
     known_users = response["known_users"]
     UpdateChats()
 })
@@ -187,10 +200,11 @@ function newChat() {
 
 let in_settings = false
 function settings() {
+    in_group_settings = false
+    document.getElementById("settings_group_container").classList.remove("settings_group_container_visible")
     in_settings = !in_settings
     let settings_container = document.getElementById("settings_container")
     if (in_settings) {
-        settings_container.classList.remove("settings_container_hidden")
         settings_container.classList.add("settings_container_visible")
         document.getElementById("settings_row_name").innerHTML = "name: " + cookies["name"]
         document.getElementById("settings_row_username").innerHTML = "username: " + cookies["username"]
@@ -198,10 +212,25 @@ function settings() {
         document.getElementById("settings_head_ico").src = `/front/icons/${cookies["username"]}.jpg`
     } else {
         settings_container.classList.remove("settings_container_visible")
-        settings_container.classList.add("settings_container_hidden")
     }
 }
 
+let in_group_settings
+function settingsGroup() {
+    in_settings = false
+    document.getElementById("settings_container").classList.remove("settings_container_visible")
+    in_group_settings = !in_group_settings
+    let settings_container = document.getElementById("settings_group_container")
+    if (in_group_settings) {
+        settings_container.classList.add("settings_group_container_visible")
+        // document.getElementById("settings_row_name").innerHTML = "name: " + cookies["name"]
+        // document.getElementById("settings_row_username").innerHTML = "username: " + cookies["username"]
+        // document.getElementById("settings_row_email").innerHTML = "email: " + cookies["email"]
+        document.getElementById("settings_group_ico").src = `/front/icons/${chats[SelectedChat]["chat_ico"]}.jpg`
+    } else {
+        settings_container.classList.remove("settings_group_container_visible")
+    }
+}
 
 // отправка сообщения
 function send_msg() {
@@ -381,3 +410,10 @@ function createGroupApply() {
     }
 }
 
+document.getElementById("chat_container").addEventListener('scroll', () => {
+    if (document.getElementById("message_container").getBoundingClientRect().bottom - window.innerHeight/3*2 <= window.innerHeight) {
+        document.getElementById("scroll_btn").classList.remove("scroll_btn_vis")
+    } else {
+        document.getElementById("scroll_btn").classList.add("scroll_btn_vis")
+    }
+})

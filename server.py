@@ -332,8 +332,8 @@ def check_registration(path):  # эта функция для обработки
                                    "chat_name": chat_name,
                                    "chat_type": chat.type,
                                    "chat_ico": chat_ico,
-                                   "all_users": chat.users,
-                                   "all_admins": chat.administrators,
+                                   "all_users": chat.users.split(';'),
+                                   "all_admins": chat.administrators.split(';'),
                                    "number_of_unread_messages": chat.unread_messages,
                                    "chat_last_message": {
                                        "message_text": '',
@@ -346,8 +346,8 @@ def check_registration(path):  # эта функция для обработки
                                    "chat_name": chat_name,
                                    "chat_ico": chat_ico,
                                    "chat_type": chat.type,
-                                   "all_users": chat.users,
-                                   "all_admins": chat.administrators,
+                                   "all_users": chat.users.split(';'),
+                                   "all_admins": chat.administrators.split(';'),
                                    "number_of_unread_messages": chat.unread_messages,
                                    "chat_last_message": {
                                        "message_text": last_mess.text,

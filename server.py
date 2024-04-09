@@ -332,6 +332,8 @@ def check_registration(path):  # эта функция для обработки
                                    "chat_name": chat_name,
                                    "chat_type": chat.type,
                                    "chat_ico": chat_ico,
+                                   "all_users": chat.users,
+                                   "all_admins": chat.administrators,
                                    "number_of_unread_messages": chat.unread_messages,
                                    "chat_last_message": {
                                        "message_text": '',
@@ -344,6 +346,8 @@ def check_registration(path):  # эта функция для обработки
                                    "chat_name": chat_name,
                                    "chat_ico": chat_ico,
                                    "chat_type": chat.type,
+                                   "all_users": chat.users,
+                                   "all_admins": chat.administrators,
                                    "number_of_unread_messages": chat.unread_messages,
                                    "chat_last_message": {
                                        "message_text": last_mess.text,
@@ -351,7 +355,6 @@ def check_registration(path):  # эта функция для обработки
                                        "message_date": last_mess.date}})
         answer['chats_and_groups'] = user_chats
         answer['known_users'] = list(tuple(known_users))
-        print(tuple(known_users))
         return answer
     if path == 'start_group':  # для создания группы нужно больше 2 человек, хеш.пароль создателя,
         # username всех участников
@@ -474,7 +477,8 @@ def new_message(msg, web_socket: WS.WebSocket):
             group_id = args['group_id']
             group = db_sess.get(Chat, group_id)
             check_admins_editor(group, editor)
-            if username == group.administrators.split(';')[0]:
+            if group.type == 'group' and username == \
+                    group.administrators.split(';')[0]:
                 group.delete_administrator(username)
                 db_sess.commit()
             else:
@@ -484,7 +488,8 @@ def new_message(msg, web_socket: WS.WebSocket):
             username = args['username']
             group_id = args['group_id']
             group = db_sess.get(Chat, group_id)
-            if editor in group.administrators.split(';'):
+            if group.type == 'group' and editor in group.administrators.split(
+                    ';'):
                 group.add_user(username)
             else:
                 return jsonify({'error': 'have no rights'})
@@ -494,7 +499,7 @@ def new_message(msg, web_socket: WS.WebSocket):
             group_id = args['group_id']
             group = db_sess.get(Chat, group_id)
 
-            if editor in group.administrators and username in group.administrators:
+            if group.type == 'group' and editor in group.administrators and username in group.administrators:
                 if editor == group.administrators.split(';')[0]:
                     group.delete_user(username)
                 else:

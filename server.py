@@ -31,6 +31,13 @@ blueprint = Blueprint(
 )
 
 
+@app.route('/edit_profile_icon', methods=['POST'])
+def upload_file():
+    username = request.args['username']
+    request.files['file'].save(dst=f'front/icons/{username}.jpg')
+    return True
+
+
 @blueprint.route('/api/get_chats', methods=['GET'])
 def get_chats():
     username = request.args['username']

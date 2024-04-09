@@ -48,6 +48,7 @@ request(`/request/get_my_chats?username=${cookies["username"]}&password_hash=${c
         } else { return -1 }
     })
     known_users = response["known_users"]
+    console.warn(response)
     UpdateChats()
 })
 
@@ -223,9 +224,17 @@ function settingsGroup() {
     let settings_container = document.getElementById("settings_group_container")
     if (in_group_settings) {
         settings_container.classList.add("settings_group_container_visible")
-        // document.getElementById("settings_row_name").innerHTML = "name: " + cookies["name"]
-        // document.getElementById("settings_row_username").innerHTML = "username: " + cookies["username"]
-        // document.getElementById("settings_row_email").innerHTML = "email: " + cookies["email"]
+        for (let usr of chats[SelectedChat]["all_users"]) {
+            document.getElementById("settings_group_users_box").innerHTML += 
+            `
+                <div class="group_users_container">
+                    <div class="group_users_box"> 
+                        <img src="/front/icons/test_bot.jpg" class="chat_ico">
+                        ${usr["username"]}
+                    </div>
+                </div>
+            `
+        }
         document.getElementById("settings_group_ico").src = `/front/icons/${chats[SelectedChat]["chat_ico"]}.jpg`
     } else {
         settings_container.classList.remove("settings_group_container_visible")

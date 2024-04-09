@@ -327,12 +327,18 @@ def check_registration(path):  # эта функция для обработки
                     chat_ico = interlocutor.username
                 else:
                     return {'error': 'can not find user'}
+            all_users = db_sess.query(User).filter(
+                User.username.in_(chat.users.split(';'))).all()
+            all_users += db_sess.query(Bot).filter(
+                Bot.username.in_(chat.users.split(';'))).all()
+            all_users = [{'username': user.username, 'name': user.name} for
+                         user in all_users]
             if len(chat.messages) == 0:
                 user_chats.append({'chat_id': chat.id,
                                    "chat_name": chat_name,
                                    "chat_type": chat.type,
                                    "chat_ico": chat_ico,
-                                   "all_users": chat.users.split(';'),
+                                   "all_users": all_users,
                                    "all_admins": chat.administrators.split(
                                        ';') if chat.administrators is not None else None,
                                    "number_of_unread_messages": chat.unread_messages,
@@ -347,7 +353,7 @@ def check_registration(path):  # эта функция для обработки
                                    "chat_name": chat_name,
                                    "chat_ico": chat_ico,
                                    "chat_type": chat.type,
-                                   "all_users": chat.users.split(';'),
+                                   "all_users": all_users,
                                    "all_admins": chat.administrators.split(
                                        ';') if chat.administrators is not None else None,
                                    "number_of_unread_messages": chat.unread_messages,

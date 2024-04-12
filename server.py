@@ -5,7 +5,6 @@ from email.mime.multipart import MIMEMultipart
 import asyncio
 
 from flask import Flask, request, send_from_directory, jsonify, Blueprint
-from werkzeug.security import generate_password_hash
 
 import format_msg
 from config import EMAIL_LOGIN, EMAIL_PASSWORD
@@ -35,7 +34,7 @@ blueprint = Blueprint(
 def upload_file():
     username = request.args['username']
     request.files['file'].save(dst=f'front/icons/{username}.jpg')
-    return True
+    return jsonify({'response': True})
 
 
 @blueprint.route('/api/get_chats', methods=['GET'])
@@ -524,6 +523,12 @@ def new_message(msg, web_socket: WS.WebSocket):
                 group.delete_user(username)
             else:
                 return jsonify({'error': 'have no rights'})
+        elif msg_type == 'search_user':  # для поиска по username-у нужны первые N букв username-а
+            chars = args['chars']
+            users = db_sess.query(User).filter(
+                User.username.contains(chars)).all() + db_sess.query(
+                Bot).filter(
+                Bot.username.contains(chars)).all()
 
 
 def check_user_chat(user: User, chat_id: int):

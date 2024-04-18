@@ -224,17 +224,20 @@ function settingsGroup() {
     let settings_container = document.getElementById("settings_group_container")
     if (in_group_settings) {
         settings_container.classList.add("settings_group_container_visible")
-        for (let usr of chats[SelectedChat]["all_users"]) {
+        document.getElementById("settings_group_users_box").innerHTML = ""
+        for (let i = 0; i < chats[SelectedChat]["all_users"].length; i++) {
+            usr = chats[SelectedChat]["all_users"][i]
             document.getElementById("settings_group_users_box").innerHTML += 
             `
-                <div class="group_users_container">
+                <div class="group_users_container" onclick="group_user_PopUp(${i})">
                     <div class="group_users_box"> 
                         <img src="/front/icons/test_bot.jpg" class="chat_ico">
-                        ${usr["username"]}
+                        ${usr["name"]}
                     </div>
                 </div>
             `
         }
+        document.getElementById("settings_group_name").innerHTML = chats[SelectedChat]["chat_name"]
         document.getElementById("settings_group_ico").src = `/front/icons/${chats[SelectedChat]["chat_ico"]}.jpg`
     } else {
         settings_container.classList.remove("settings_group_container_visible")
@@ -378,6 +381,7 @@ document.getElementById('fileInput').addEventListener('change', function() {
 function closeAll_pop_up_windows() {
     document.getElementById("pop-up_window_container").style.visibility = "hidden"
     document.getElementById("create_group_container").style.visibility = "hidden"
+    document.getElementById("group_user_set_container").style.visibility = "hidden"
 }
 
 function createGroupPopUp() {
@@ -394,6 +398,7 @@ function createGroupPopUp() {
         </div>
         `
     }
+    
 }
 
 let selectedUsersInCreateGroupPopUp = []
@@ -417,6 +422,13 @@ function createGroupApply() {
         if (group_name == "") { alert("You must specify the name of the group!") }
         else if (selectedUsersInCreateGroupPopUp.length == 0) { alert("You need to select at least one participant!") }
     }
+}
+
+function group_user_PopUp(i) {
+    document.getElementById("pop-up_window_container").style.visibility = "visible"
+    document.getElementById("group_user_set_container").style.visibility = "visible"
+    document.getElementById("group_user_set_container_ico").src = `/front/icons/${chats[SelectedChat]["all_users"][i]}.jpg`
+    document.getElementById("group_user_set_container_ico").onclick = `window.open('/front/icons/${chats[SelectedChat]["all_users"][i]}.jpg', '_blank')`
 }
 
 document.getElementById("chat_container").addEventListener('scroll', () => {

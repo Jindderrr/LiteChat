@@ -529,6 +529,7 @@ def new_message(msg, web_socket: WS.WebSocket):
                 User.username.contains(chars)).all() + db_sess.query(
                 Bot).filter(
                 Bot.username.contains(chars)).all()
+            return jsonify({'users': users[:20]})
 
 
 def check_user_chat(user: User, chat_id: int):

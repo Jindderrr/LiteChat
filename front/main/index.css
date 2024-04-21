@@ -115,12 +115,12 @@ button:active {
 }
 .settings_group_users_box {
     border-top: 1px solid black;
-    background-color: rgb(179, 179, 179);
+    background-color: var(--group-users-container);
     position: absolute;
     width: 100%;
 }
 .group_users_container {
-    background-color: rgb(155, 155, 155);
+    background-color: var(--known_user-info-container-color);
     transition: background-color 0.15s;
     border-radius: 15px;
     height: 70px;
@@ -128,7 +128,7 @@ button:active {
     cursor: pointer;
 }
 .group_users_container:hover {
-    background-color: rgb(135, 135, 135);
+    background-color: var(--known_user-info-container-color-hover);
     transition: background-color 0.25s;
 }
 .group_users_box {
@@ -399,6 +399,7 @@ button:active {
 }
 .group_user_set_container, .create_group_container {
     position: absolute;
+    background-color: var(--pop-up-container-color);
 }
 .create_group_container {
     visibility: hidden;
@@ -407,11 +408,11 @@ button:active {
     width: 40%;
     border-radius: 24px;
     box-shadow: 0 0 200px rgba(0, 0, 0, 0.7);
-    background-color: rgb(255, 255, 255);
 }
 .create_group_name {
     outline: hidden;
-    outline: 0px solid rgb(255, 255, 255);
+    outline: 0px solid white;
+    background-color: var(--pop-up-container-color);
     border-width: 0px;
     text-align: center;
     position: relative;
@@ -432,7 +433,7 @@ button:active {
     height: 65px;
     width: 100%;
     margin-top: 10px;
-    background-color: rgb(244, 244, 244);
+    background-color: var(--known_user-info-container-color);
     transition: background-color 0.15s;
     border-radius: 12px;
     display: flex;
@@ -441,7 +442,7 @@ button:active {
     cursor: pointer;
 }
 .create_group_known_user_info_container:hover {
-    background-color: rgb(198, 198, 198);
+    background-color: var(--known_user-info-container-color-hover);
     transition: background-color 0.25s;
 }
 .create_group_known_user_info_container_selected {
@@ -485,7 +486,6 @@ button:active {
     width: 40%;
     height: 60%;
     border-radius: 34px;
-    background-color: aqua;
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -15,13 +15,17 @@
     --bot-commands-color: rgb(160, 70, 70);
     --settings-row-color: rgb(230, 215, 200);
     --my-message-time-color: rgb(100, 100, 100);
+    --pop-up-container-color: rgb(215, 200, 185);
+    --known_user-info-container-color: rgb(200, 190, 180);
+    --known_user-info-container-color-hover: rgb(175, 160, 150);
+    --group-users-container: rgb(220, 210, 200);
 }
 .dark-theme {
     --chat-color: rgb(4, 5, 10);
     --chat-top-info-color: rgb(40, 40, 40);
     --chats-container-color: rgb(22, 22, 28);
     --msg-input-color: rgb(60, 60, 60);
-    --msg-input-placeholder-color: rgba(255, 255, 255, 0.4);
+    --msg-input-placeholder-color: rgba(144, 138, 138, 0.4);
     --text_color: rgb(210, 210, 210);
     --left-panel-color: rgb(28, 28, 28);
     --left-panel-buttons-color: rgb(55, 55, 55);
@@ -33,6 +37,10 @@
     --bot-commands-color: rgb(255, 100, 100);
     --settings-row-color: rgb(75, 75, 75);
     --my-message-time-color: rgb(192, 192, 192);
+    --pop-up-container-color: rgb(50, 50, 50);
+    --known_user-info-container-color: rgb(85, 85, 85);
+    --known_user-info-container-color-hover: rgb(100, 100, 100);
+    --group-users-container: rgb(50, 50, 50);
 }
 .light-theme {
     --chat-color: rgb(226, 226, 227);
@@ -51,6 +59,10 @@
     --bot-commands-color: rgb(160, 0, 0);
     --settings-row-color: rgb(202, 202, 202);
     --my-message-time-color: rgb(100, 100, 100);
+    --pop-up-container-color: rgb(225, 225, 225);
+    --known_user-info-container-color: rgb(208, 208, 208);
+    --known_user-info-container-color-hover: rgb(164, 164, 164);
+    --group-users-container: rgb(235, 235, 235);
 }
 .purple-theme {
     --chat-color: rgb(192, 116, 188);
@@ -69,6 +81,10 @@
     --bot-commands-color: rgb(255, 255, 0);
     --settings-row-color: rgb(180, 0, 170);
     --my-message-time-color: rgb(100, 100, 100);
+    --pop-up-container-color: rgb(195, 115, 190);
+    --known_user-info-container-color: rgb(215, 135, 205);
+    --known_user-info-container-color-hover: rgb(150, 80, 150);
+    --group-users-container: rgb(255, 130, 230);
 }
 .green-theme {
     --chat-color: rgb(103, 194, 102);
@@ -87,6 +103,10 @@
     --bot-commands-color: rgb(0, 0, 255);
     --settings-row-color: rgb(105, 220, 90);
     --my-message-time-color: rgb(100, 100, 100);
+    --pop-up-container-color: rgb(105, 195, 105);
+    --known_user-info-container-color: rgb(0, 215, 70);
+    --known_user-info-container-color-hover: rgb(0, 195, 60);
+    --group-users-container: rgb(70, 255, 105);
 }
 .blue-theme {
     --chat-color: rgb(102, 142, 194);
@@ -105,4 +125,8 @@
     --bot-commands-color: rgb(255, 255, 255);
     --settings-row-color: rgb(110, 145, 250);
     --my-message-time-color: rgb(100, 100, 100);
+    --pop-up-container-color: rgb(105, 145, 195);
+    --known_user-info-container-color: rgb(50, 125, 220);
+    --known_user-info-container-color-hover: rgb(55, 135, 230);
+    --group-users-container: rgb(80, 150, 255);
 }

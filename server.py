@@ -329,7 +329,7 @@ def check_registration(path):  # эта функция для обработки
                         known_users.append({'username': interlocutor.username,
                                             'name': interlocutor.name})
                     else:
-                        chat_name = "GroupName"
+                        chat_name = chat.name
                     chat_ico = interlocutor.username
                 else:
                     return {'error': 'can not find user'}

@@ -7,11 +7,11 @@ from data_py.users import User
 db_session.global_init('db/messenger.db')
 db_sess = db_session.create_session()
 
-user = User(name='name1',username='username1',email='email1@email.com')
+user = User(name='Петя',username='Petr',email='pety_krutoy@email.com')
 user.set_password('password1')
 db_sess.add(user)
 db_sess.commit()
-user = User(name='name2',username='username2',email='email2@email.com')
+user = User(name='Вася',username='Vasyan',email='vasya2005@email.com')
 user.set_password('password2')
 db_sess.add(user)
 db_sess.commit()
